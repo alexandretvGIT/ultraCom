@@ -100,86 +100,95 @@
 
         ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+        /* Seletor de idioma */
+        #langSwitch { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(15,23,42,.8); border: 1px solid #1e293b; opacity: .7; transition: opacity .2s; }
+        #langSlotMenu { position: absolute; top: calc(.75rem + env(safe-area-inset-top)); right: calc(.75rem + env(safe-area-inset-right)); }
+        #langSwitch:hover, #langSwitch:focus-within { opacity: 1; }
+        .lang-btn { width: 36px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; filter: grayscale(.8) brightness(.8); transition: filter .15s, background .15s; }
+        .lang-btn svg { width: 22px; height: 15px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.15); }
+        .lang-btn[aria-pressed="true"] { filter: none; background: rgba(0,243,255,.12); }
+        .lang-btn:hover { filter: none; }
     </style>
 </head>
 <body class="p-3 md:p-8">
 
     <!-- MENU -->
     <div id="screenMenu" class="flex-grow flex flex-col items-center justify-center fade-in py-6">
+        <div id="langSlotMenu"></div>
         <div class="text-center mb-10">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4" style="color:var(--blue);text-shadow:0 0 15px rgba(0,243,255,.5)">MODEM ULTRASSÔNICO</h1>
-            <p class="text-slate-400 text-base md:text-xl">Grave um áudio, envie por ultrassom e receba em outro aparelho.</p>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4" style="color:var(--blue);text-shadow:0 0 15px rgba(0,243,255,.5)" data-i18n="menu.title">MODEM ULTRASSÔNICO</h1>
+            <p class="text-slate-400 text-base md:text-xl" data-i18n="menu.subtitle">Grave um áudio, envie por ultrassom e receba em outro aparelho.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 w-full max-w-4xl">
             <button onclick="switchMode('tx')" class="btn-neon-green flex flex-col items-center p-8 md:p-10 rounded-xl group">
                 <svg class="w-16 h-16 md:w-20 md:h-20 mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
-                <span class="text-2xl font-bold tracking-wider">Transmissor</span>
-                <span class="text-sm mt-2 text-slate-400">Grava, guarda e envia seus áudios</span>
+                <span class="text-2xl font-bold tracking-wider" data-i18n="menu.tx">Transmissor</span>
+                <span class="text-sm mt-2 text-slate-400" data-i18n="menu.txSub">Grava, guarda e envia seus áudios</span>
             </button>
             <button onclick="switchMode('rx')" class="btn-neon-blue flex flex-col items-center p-8 md:p-10 rounded-xl group">
                 <svg class="w-16 h-16 md:w-20 md:h-20 mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-                <span class="text-2xl font-bold tracking-wider">Receptor</span>
-                <span class="text-sm mt-2 text-slate-400">Escuta o ultrassom e recupera o áudio</span>
+                <span class="text-2xl font-bold tracking-wider" data-i18n="menu.rx">Receptor</span>
+                <span class="text-sm mt-2 text-slate-400" data-i18n="menu.rxSub">Escuta o ultrassom e recupera o áudio</span>
             </button>
         </div>
-        <p class="text-slate-500 text-sm mt-8 max-w-2xl text-center">Use o alto-falante e o microfone dos próprios aparelhos. Caixas e fones Bluetooth cortam o ultrassom.</p>
+        <p class="text-slate-500 text-sm mt-8 max-w-2xl text-center" data-i18n="menu.note">Use o alto-falante e o microfone dos próprios aparelhos. Caixas e fones Bluetooth cortam o ultrassom.</p>
     </div>
 
     <!-- TRANSMISSOR -->
     <div id="screenTX" class="hidden flex-grow flex-col max-w-6xl mx-auto w-full fade-in">
         <header class="flex justify-between items-center mb-5 pb-3 border-b border-slate-800 gap-3">
             <h2 class="text-xl md:text-2xl font-bold text-green-400 flex items-center gap-2 tracking-widest">
-                <span id="txIndicator" class="w-3 h-3 bg-slate-600 rounded-full"></span> TX // TRANSMISSOR
+                <span id="txIndicator" class="w-3 h-3 bg-slate-600 rounded-full"></span> <span data-i18n="tx.header">TX // TRANSMISSOR</span>
             </h2>
-            <button onclick="switchMode('menu')" class="px-3 py-2 btn-ghost rounded text-sm">Menu</button>
+            <div class="flex items-center gap-2"><div id="langSlotTX"></div><button onclick="switchMode('menu')" class="px-3 py-2 btn-ghost rounded text-sm" data-i18n="nav.menu">Menu</button></div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <!-- Biblioteca -->
             <section class="lg:col-span-7 glass-panel p-4 md:p-6">
                 <div class="flex items-baseline justify-between mb-4">
-                    <h3 class="text-lg font-bold text-slate-200">Meus áudios</h3>
+                    <h3 class="text-lg font-bold text-slate-200" data-i18n="lib.title">Meus áudios</h3>
                     <span id="libCount" class="text-xs text-slate-500"></span>
                 </div>
 
                 <div id="recIdle" class="grid grid-cols-2 gap-3 mb-4">
                     <button onclick="startRecording()" class="btn-red rounded-lg py-4 font-bold text-lg flex items-center justify-center gap-2">
-                        <span class="w-3 h-3 rounded-full" style="background:var(--red)"></span> Gravar
+                        <span class="w-3 h-3 rounded-full" style="background:var(--red)"></span> <span data-i18n="lib.record">Gravar</span>
                     </button>
                     <button onclick="$('fileInput').click()" class="btn-ghost rounded-lg py-4 font-bold text-lg flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4"/></svg> Importar
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4"/></svg> <span data-i18n="lib.import">Importar</span>
                     </button>
                     <input id="fileInput" type="file" accept="audio/*" multiple class="hidden" onchange="importFiles(this.files); this.value=''">
                 </div>
 
                 <div id="recActive" class="hidden mb-4 rounded-lg p-4" style="border:1px solid var(--red);background:rgba(255,77,109,.06)">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="flex items-center gap-2 font-bold" style="color:var(--red)"><span class="w-3 h-3 rounded-full animate-pulse" style="background:var(--red)"></span> Gravando</span>
+                        <span class="flex items-center gap-2 font-bold" style="color:var(--red)"><span class="w-3 h-3 rounded-full animate-pulse" style="background:var(--red)"></span> <span data-i18n="lib.recording">Gravando</span></span>
                         <span id="recTimer" class="text-2xl text-white">0:00</span>
                     </div>
                     <div class="meter mb-1"><div id="recLevel" style="background:var(--red)"></div></div>
-                    <p class="text-xs text-slate-400 mb-3">Fale perto do microfone. Limite de 1 minuto.</p>
+                    <p class="text-xs text-slate-400 mb-3" data-i18n="lib.recHint">Fale perto do microfone. Limite de 1 minuto.</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="stopRecording(true)" class="btn-neon-green rounded py-3 font-bold">Parar e salvar</button>
-                        <button onclick="stopRecording(false)" class="btn-ghost rounded py-3">Descartar</button>
+                        <button onclick="stopRecording(true)" class="btn-neon-green rounded py-3 font-bold" data-i18n="lib.saveStop">Parar e salvar</button>
+                        <button onclick="stopRecording(false)" class="btn-ghost rounded py-3" data-i18n="lib.discard">Descartar</button>
                     </div>
                 </div>
 
                 <ul id="libList"></ul>
-                <p id="libEmpty" class="text-sm text-slate-500 py-6 text-center">Grave ou importe um áudio para começar.</p>
+                <p id="libEmpty" class="text-sm text-slate-500 py-6 text-center" data-i18n="lib.empty">Grave ou importe um áudio para começar.</p>
             </section>
 
             <div class="lg:col-span-5 flex flex-col gap-5">
                 <!-- Transmitir -->
                 <section class="glass-panel p-4 md:p-6">
-                    <h3 class="text-lg font-bold text-slate-200 mb-3">Transmitir</h3>
+                    <h3 class="text-lg font-bold text-slate-200 mb-3" data-i18n="tx.title">Transmitir</h3>
                     <div id="txSelected" class="text-sm text-slate-400 mb-4 min-h-[2.5rem]"></div>
-                    <button id="btnTx" onclick="startTransmission()" disabled class="w-full btn-neon-green font-bold py-4 rounded-lg text-lg tracking-wider">&gt;&gt; Transmitir em ultrassom</button>
-                    <button id="btnTxStop" onclick="stopTransmission()" class="hidden w-full btn-ghost font-bold py-3 rounded-lg mt-3">Parar</button>
+                    <button id="btnTx" onclick="startTransmission()" disabled class="w-full btn-neon-green font-bold py-4 rounded-lg text-lg tracking-wider" data-i18n="tx.button">&gt;&gt; Transmitir em ultrassom</button>
+                    <button id="btnTxStop" onclick="stopTransmission()" class="hidden w-full btn-ghost font-bold py-3 rounded-lg mt-3" data-i18n="tx.stop">Parar</button>
                     <div class="flex gap-2 mt-4">
-                        <div class="step" id="stStart">Início</div>
-                        <div class="step" id="stAudio">Áudio</div>
-                        <div class="step" id="stEnd">Fim</div>
+                        <div class="step" id="stStart" data-i18n="tx.stStart">Início</div>
+                        <div class="step" id="stAudio" data-i18n="tx.stAudio">Áudio</div>
+                        <div class="step" id="stEnd" data-i18n="tx.stEnd">Fim</div>
                     </div>
                     <div class="h-1 bg-slate-800 rounded mt-3"><div id="txProgress" class="h-1 rounded" style="width:0%;background:var(--green);box-shadow:0 0 8px var(--green)"></div></div>
                     <div class="flex justify-between text-xs text-slate-500 mt-2"><span id="txPhase">Pronto</span><span id="txTime"></span></div>
@@ -188,17 +197,17 @@
                 <!-- Canal -->
                 <details class="glass-panel p-4 md:p-6" id="txChannel">
                     <summary class="flex items-center justify-between">
-                        <span><span class="text-lg font-bold text-slate-200">Canal</span><br><span class="text-xs text-slate-400 chanSummary"></span></span>
+                        <span><span class="text-lg font-bold text-slate-200" data-i18n="ch.title">Canal</span><br><span class="text-xs text-slate-400 chanSummary"></span></span>
                         <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
                     </summary>
                     <div class="mt-4 space-y-4" id="txChannelBody"></div>
                     <div class="mt-4">
-                        <label class="flex justify-between text-sm mb-1 text-slate-400" for="txVolume"><span>Volume de saída</span><span id="txVolumeVal" class="text-green-400"></span></label>
+                        <label class="flex justify-between text-sm mb-1 text-slate-400" for="txVolume"><span data-i18n="ch.volume">Volume de saída</span><span id="txVolumeVal" class="text-green-400"></span></label>
                         <input type="range" id="txVolume" min="0.1" max="1" step="0.05">
-                        <p class="text-xs text-slate-500">Deixe o volume do aparelho no máximo e ajuste aqui. Volume alto demais distorce e pode ficar audível.</p>
+                        <p class="text-xs text-slate-500" data-i18n="ch.volumeHint">Deixe o volume do aparelho no máximo e ajuste aqui. Volume alto demais distorce e pode ficar audível.</p>
                     </div>
-                    <button id="btnCal" onclick="playCalibration()" class="w-full mt-4 btn-ghost rounded py-3 text-sm">Tocar sinal de calibração</button>
-                    <p class="text-xs text-slate-500 mt-2">Toque isto enquanto o receptor estiver em "Calibrar": ele mede a sala e sugere a melhor faixa.</p>
+                    <button id="btnCal" onclick="playCalibration()" class="w-full mt-4 btn-ghost rounded py-3 text-sm" data-i18n="ch.calPlay">Tocar sinal de calibração</button>
+                    <p class="text-xs text-slate-500 mt-2" data-i18n="ch.calPlayHint">Toque isto enquanto o receptor estiver em "Calibrar": ele mede a sala e sugere a melhor faixa.</p>
                 </details>
             </div>
         </div>
@@ -208,9 +217,9 @@
     <div id="screenRX" class="hidden flex-grow flex-col max-w-6xl mx-auto w-full fade-in">
         <header class="flex justify-between items-center mb-5 pb-3 border-b border-slate-800 gap-3">
             <h2 class="text-xl md:text-2xl font-bold text-cyan-400 flex items-center gap-2 tracking-widest">
-                <span id="rxIndicator" class="w-3 h-3 bg-slate-600 rounded-full"></span> RX // RECEPTOR
+                <span id="rxIndicator" class="w-3 h-3 bg-slate-600 rounded-full"></span> <span data-i18n="rx.header">RX // RECEPTOR</span>
             </h2>
-            <button onclick="switchMode('menu')" class="px-3 py-2 btn-ghost rounded text-sm">Menu</button>
+            <div class="flex items-center gap-2"><div id="langSlotRX"></div><button onclick="switchMode('menu')" class="px-3 py-2 btn-ghost rounded text-sm" data-i18n="nav.menu">Menu</button></div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -222,55 +231,55 @@
                     <span id="rxTimer" class="text-lg text-white"></span>
                 </div>
                 <div class="mt-4">
-                    <div class="flex justify-between text-xs text-slate-400 mb-1"><span>Sinal do transmissor</span><span id="rxSigVal">–</span></div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-1"><span data-i18n="rx.signal">Sinal do transmissor</span><span id="rxSigVal">–</span></div>
                     <div class="meter"><div id="rxSig" style="background:var(--green)"></div></div>
                 </div>
                 <button id="btnManual" onclick="toggleManual()" disabled class="w-full btn-red rounded-lg py-3 mt-4 font-bold">Gravar manualmente</button>
                 <details id="rxOptions" class="mt-4 border-t border-slate-800 pt-3">
-                    <summary class="flex items-center justify-between text-sm text-slate-300 py-1">Opções de recepção
+                    <summary class="flex items-center justify-between text-sm text-slate-300 py-1"><span data-i18n="rx.options">Opções de recepção</span>
                         <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
-                    <label class="switch"><span class="text-sm">Detectar início e fim sozinho</span><input type="checkbox" id="optAuto" checked><span class="track"></span></label>
-                    <label class="switch"><span class="text-sm">Filtro passa-alta<br><span class="text-xs text-slate-500">ignora o som normal do ambiente</span></span><input type="checkbox" id="optHP" checked><span class="track"></span></label>
-                    <label class="switch"><span class="text-sm">Reduzir ruído do áudio recebido</span><input type="checkbox" id="optDenoise" checked><span class="track"></span></label>
-                    <label class="switch"><span class="text-sm">Tocar ao receber</span><input type="checkbox" id="optAutoplay" checked><span class="track"></span></label>
+                    <label class="switch"><span class="text-sm" data-i18n="rx.optAuto">Detectar início e fim sozinho</span><input type="checkbox" id="optAuto" checked><span class="track"></span></label>
+                    <label class="switch"><span class="text-sm"><span data-i18n="rx.optHP">Filtro passa-alta</span><br><span class="text-xs text-slate-500" data-i18n="rx.optHPsub">ignora o som normal do ambiente</span></span><input type="checkbox" id="optHP" checked><span class="track"></span></label>
+                    <label class="switch"><span class="text-sm" data-i18n="rx.optDenoise">Reduzir ruído do áudio recebido</span><input type="checkbox" id="optDenoise" checked><span class="track"></span></label>
+                    <label class="switch"><span class="text-sm" data-i18n="rx.optAutoplay">Tocar ao receber</span><input type="checkbox" id="optAutoplay" checked><span class="track"></span></label>
                 </details>
             </section>
 
             <!-- Espectrograma -->
             <section class="glass-panel p-3 lg:col-span-8 lg:col-start-1 lg:row-start-1 flex flex-col">
                 <div class="flex justify-between text-xs text-slate-400 mb-2 px-1">
-                    <span>Espectrograma (tempo →)</span><span id="rxLevel">-- dBFS</span>
+                    <span data-i18n="rx.spectro">Espectrograma (tempo →)</span><span id="rxLevel">-- dBFS</span>
                 </div>
                 <div class="relative h-52 md:h-64 lg:h-auto lg:flex-1 lg:min-h-[16rem]">
                     <canvas id="rxCanvas" class="absolute inset-0 w-full h-full rounded" style="background:#020617"></canvas>
                     <canvas id="rxGuides" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
                 </div>
                 <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-2 px-1">
-                    <span><span style="color:var(--blue)">▬</span> faixa do áudio</span>
-                    <span><span style="color:var(--green)">▬</span> sinais de início e fim</span>
-                    <span><span style="color:var(--red)">- -</span> corte do passa-alta</span>
+                    <span><span style="color:var(--blue)">▬</span> <span data-i18n="rx.legAudio">faixa do áudio</span></span>
+                    <span><span style="color:var(--green)">▬</span> <span data-i18n="rx.legMarks">sinais de início e fim</span></span>
+                    <span><span style="color:var(--red)">- -</span> <span data-i18n="rx.legHP">corte do passa-alta</span></span>
                 </div>
             </section>
 
             <!-- Recebidos -->
             <section class="glass-panel p-4 md:p-6 lg:col-span-8 lg:col-start-1 lg:row-start-2 self-start w-full">
                 <div class="flex items-baseline justify-between mb-4">
-                    <h3 class="text-lg font-bold text-slate-200">Áudios recebidos</h3>
-                    <button id="btnClearRx" onclick="deleteAllRx()" class="hidden text-xs text-slate-500 hover:text-white py-2">Excluir todos</button>
+                    <h3 class="text-lg font-bold text-slate-200" data-i18n="rx.listTitle">Áudios recebidos</h3>
+                    <button id="btnClearRx" onclick="deleteAllRx()" class="hidden text-xs text-slate-500 hover:text-white py-2" data-i18n="rx.deleteAll">Excluir todos</button>
                 </div>
                 <ul id="rxList"></ul>
-                <p id="rxEmpty" class="text-sm text-slate-500 py-6 text-center">Nada recebido ainda. Ative a escuta e transmita do outro aparelho.</p>
+                <p id="rxEmpty" class="text-sm text-slate-500 py-6 text-center" data-i18n="rx.empty">Nada recebido ainda. Ative a escuta e transmita do outro aparelho.</p>
             </section>
 
             <!-- Canal -->
             <details class="glass-panel p-4 md:p-6 lg:col-span-4 lg:col-start-9 lg:row-start-2 self-start" id="rxChannel">
                 <summary class="flex items-center justify-between">
-                    <span><span class="text-lg font-bold text-slate-200">Canal</span><br><span class="text-xs text-slate-400 chanSummary"></span></span>
+                    <span><span class="text-lg font-bold text-slate-200" data-i18n="ch.title">Canal</span><br><span class="text-xs text-slate-400 chanSummary"></span></span>
                     <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
                 </summary>
-                <p class="text-xs text-slate-400 mt-3">Precisa ser a mesma faixa do transmissor.</p>
+                <p class="text-xs text-slate-400 mt-3" data-i18n="ch.same">Precisa ser a mesma faixa do transmissor.</p>
                 <div class="mt-3 space-y-4" id="rxChannelBody"></div>
-                <button onclick="startCalibration()" class="w-full mt-4 btn-ghost rounded py-3 text-sm">Calibrar faixa</button>
+                <button onclick="startCalibration()" class="w-full mt-4 btn-ghost rounded py-3 text-sm" data-i18n="ch.calibrate">Calibrar faixa</button>
             </details>
         </div>
     </div>
@@ -278,14 +287,14 @@
     <!-- Calibração -->
     <div id="calModal" class="fixed inset-0 z-40 flex items-center justify-center modal-overlay hidden p-3">
         <div class="bg-slate-900 border border-slate-700 p-5 rounded-lg max-w-3xl w-full shadow-2xl">
-            <h3 class="text-xl font-bold mb-2 text-white">Calibrar faixa</h3>
+            <h3 class="text-xl font-bold mb-2 text-white" data-i18n="cal.title">Calibrar faixa</h3>
             <p id="calStatus" class="text-slate-300 mb-4 font-sans"></p>
             <canvas id="calCanvas" class="w-full h-48 md:h-56 rounded" style="background:#020617"></canvas>
             <p id="calResult" class="text-sm text-slate-300 mt-4 font-sans"></p>
             <div class="flex flex-wrap justify-end gap-3 mt-5">
-                <button id="calFinish" onclick="finishCalibration()" class="btn-ghost px-4 py-3 rounded text-sm">Concluir agora</button>
-                <button id="calApply" onclick="applyCalibration()" class="hidden btn-neon-green px-4 py-3 rounded text-sm font-bold">Usar esta faixa</button>
-                <button onclick="closeCalibration()" class="btn-neon-blue px-4 py-3 rounded text-sm">Fechar</button>
+                <button id="calFinish" onclick="finishCalibration()" class="btn-ghost px-4 py-3 rounded text-sm" data-i18n="cal.finishNow">Concluir agora</button>
+                <button id="calApply" onclick="applyCalibration()" class="hidden btn-neon-green px-4 py-3 rounded text-sm font-bold" data-i18n="cal.apply">Usar esta faixa</button>
+                <button onclick="closeCalibration()" class="btn-neon-blue px-4 py-3 rounded text-sm" data-i18n="act.close">Fechar</button>
             </div>
         </div>
     </div>
@@ -294,12 +303,174 @@
         <div class="bg-slate-900 border border-slate-700 p-6 rounded-lg max-w-md w-full shadow-2xl">
             <h3 id="msgBoxTitle" class="text-xl font-bold mb-2 text-white"></h3>
             <p id="msgBoxText" class="text-slate-300 mb-6 font-sans"></p>
-            <div class="flex justify-end"><button onclick="closeMsgBox()" class="btn-neon-blue px-6 py-3 rounded font-bold text-sm">Entendido</button></div>
+            <div class="flex justify-end"><button onclick="closeMsgBox()" class="btn-neon-blue px-6 py-3 rounded font-bold text-sm" data-i18n="act.ok">Entendido</button></div>
         </div>
+    </div>
+
+    <div id="langSwitch" role="group" data-i18n-aria="lang.label" aria-label="Idioma">
+        <button class="lang-btn" data-lang="pt" onclick="setLang('pt')" aria-label="Português (Brasil)" title="Português (Brasil)">
+            <svg viewBox="0 0 20 14"><rect width="20" height="14" fill="#009c3b"/><path d="M10 1.6 18.4 7 10 12.4 1.6 7z" fill="#ffdf00"/><circle cx="10" cy="7" r="3.1" fill="#002776"/><path d="M7 6.2q3-.9 6 .8" stroke="#fff" stroke-width=".55" fill="none"/></svg>
+        </button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')" aria-label="English (US)" title="English (US)">
+            <svg viewBox="0 0 19 13"><rect width="19" height="13" fill="#fff"/><g fill="#b22234"><rect width="19" height="1"/><rect y="2" width="19" height="1"/><rect y="4" width="19" height="1"/><rect y="6" width="19" height="1"/><rect y="8" width="19" height="1"/><rect y="10" width="19" height="1"/><rect y="12" width="19" height="1"/></g><rect width="8" height="7" fill="#3c3b6e"/><g fill="#fff"><circle cx="1.5" cy="1.4" r=".35"/><circle cx="4" cy="1.4" r=".35"/><circle cx="6.5" cy="1.4" r=".35"/><circle cx="2.75" cy="2.8" r=".35"/><circle cx="5.25" cy="2.8" r=".35"/><circle cx="1.5" cy="4.2" r=".35"/><circle cx="4" cy="4.2" r=".35"/><circle cx="6.5" cy="4.2" r=".35"/><circle cx="2.75" cy="5.6" r=".35"/><circle cx="5.25" cy="5.6" r=".35"/></g></svg>
+        </button>
     </div>
 
     <div id="toast" role="status" aria-live="polite"><span id="toastText"></span><button id="toastAction" class="hidden"></button></div>
 
+    <script>
+/* ================= IDIOMAS (PT-BR / EN-US) ================= */
+const I18N = {
+    pt: {
+        'doc.title': 'Modem Ultrassônico de Áudio',
+        'menu.title': 'MODEM ULTRASSÔNICO',
+        'menu.subtitle': 'Grave um áudio, envie por ultrassom e receba em outro aparelho.',
+        'menu.tx': 'Transmissor', 'menu.txSub': 'Grava, guarda e envia seus áudios',
+        'menu.rx': 'Receptor', 'menu.rxSub': 'Escuta o ultrassom e recupera o áudio',
+        'menu.note': 'Use o alto-falante e o microfone dos próprios aparelhos. Caixas e fones Bluetooth cortam o ultrassom.',
+        'nav.menu': 'Menu',
+        'tx.header': 'TX // TRANSMISSOR', 'rx.header': 'RX // RECEPTOR',
+        'lib.title': 'Meus áudios', 'lib.record': 'Gravar', 'lib.import': 'Importar',
+        'lib.recording': 'Gravando', 'lib.recHint': 'Fale perto do microfone. Limite de 1 minuto.',
+        'lib.saveStop': 'Parar e salvar', 'lib.discard': 'Descartar',
+        'lib.empty': 'Grave ou importe um áudio para começar.',
+        'lib.count1': '{n} áudio', 'lib.countN': '{n} áudios', 'lib.imported': 'importado',
+        'lib.recName': 'Gravação {n}', 'lib.fileName': 'Arquivo', 'lib.renamePrompt': 'Nome do áudio:',
+        'tx.title': 'Transmitir', 'tx.button': '>> Transmitir em ultrassom', 'tx.stop': 'Parar',
+        'tx.stStart': 'Início', 'tx.stAudio': 'Áudio', 'tx.stEnd': 'Fim',
+        'tx.ready': 'Pronto', 'tx.preparing': 'Preparando o sinal…', 'tx.starting': 'Iniciando…',
+        'tx.willSend': 'Vai transmitir:', 'tx.airTime': 'Duração no ar ≈ {t} com os sinais de início e fim.',
+        'tx.pick': 'Grave ou importe um áudio e toque nele para escolher.',
+        'tx.phStart': 'Sinal de início: avisa o receptor para começar a gravar', 'tx.phAudio': 'Transmitindo "{name}"',
+        'tx.phEnd': 'Sinal de fim: avisa o receptor para parar',
+        'tx.done': 'Transmissão concluída', 'tx.calDone': 'Calibração concluída', 'tx.stopped': 'Interrompida',
+        'tx.calNow': 'Calibração: <span style="color:var(--green)">{f}</span>. Você ainda ouve?',
+        'tx.failTitle': 'Não foi possível transmitir', 'tx.maxFreq': 'Este aparelho toca no máximo {f}. Escolha uma faixa mais baixa.',
+        'ch.title': 'Canal', 'ch.band': 'Faixa', 'ch.bandStart': 'Início da faixa', 'ch.same': 'Precisa ser a mesma faixa do transmissor.',
+        'ch.volume': 'Volume de saída', 'ch.volumeHint': 'Deixe o volume do aparelho no máximo e ajuste aqui. Volume alto demais distorce e pode ficar audível.',
+        'ch.calPlay': 'Tocar sinal de calibração', 'ch.calPlayHint': 'Toque isto enquanto o receptor estiver em "Calibrar": ele mede a sala e sugere a melhor faixa.',
+        'ch.calibrate': 'Calibrar faixa',
+        'ch.info': 'O áudio (0,3–3 kHz) é deslocado para {a}–{b}. Sinal de início em {p}, de fim em {e}.',
+        'ch.audible': ' Modo de teste: você vai ouvir o sinal.', 'ch.kids': ' Crianças e jovens podem ouvir um chiado.',
+        'ch.above20': ' Acima de 20 kHz muitos celulares perdem força; se falhar, use Quase-ultrassom.',
+        'preset.ultra': 'Ultrassom', 'preset.quase': 'Quase-ultrassom', 'preset.robusto': 'Robusto', 'preset.teste': 'Teste audível', 'preset.custom': 'Personalizada',
+        'rx.listen': 'Ativar escuta', 'rx.stopListen': 'Parar escuta', 'rx.signal': 'Sinal do transmissor', 'rx.none': 'nenhum',
+        'rx.manual': 'Gravar manualmente', 'rx.manualStop': 'Parar e salvar', 'rx.options': 'Opções de recepção',
+        'rx.optAuto': 'Detectar início e fim sozinho', 'rx.optHP': 'Filtro passa-alta', 'rx.optHPsub': 'ignora o som normal do ambiente',
+        'rx.optDenoise': 'Reduzir ruído do áudio recebido', 'rx.optAutoplay': 'Tocar ao receber',
+        'rx.spectro': 'Espectrograma (tempo →)', 'rx.legAudio': 'faixa do áudio', 'rx.legMarks': 'sinais de início e fim', 'rx.legHP': 'corte do passa-alta',
+        'rx.listTitle': 'Áudios recebidos', 'rx.deleteAll': 'Excluir todos', 'rx.empty': 'Nada recebido ainda. Ative a escuta e transmita do outro aparelho.',
+        'pill.off': 'Desligado', 'pill.wait': 'Aguardando sinal de início', 'pill.manualListen': 'Escutando (modo manual)',
+        'pill.recv': 'Recebendo áudio', 'pill.busy': 'Processando áudio…', 'pill.manual': 'Gravando manualmente',
+        'rx.recvName': 'Recebido {t}', 'how.auto': 'automático', 'how.auto_noend': 'automático, sem sinal de fim', 'how.manual': 'manual',
+        'rx.gotIt': 'Áudio recebido ({t})', 'rx.tooEarly': 'Sinal interrompido cedo demais; nada foi salvo.',
+        'rx.manualShort': 'Gravação manual muito curta; nada foi salvo.', 'rx.procFail': 'Falha ao processar o áudio recebido.',
+        'rx.rangeTitle': 'Faixa fora do alcance', 'rx.rangeMsg': 'O microfone deste aparelho vai até {f}. Escolha uma faixa mais baixa.',
+        'act.play': 'Ouvir', 'act.pause': 'Pausar', 'act.rename': 'Renomear', 'act.delete': 'Excluir', 'act.download': 'Baixar', 'act.undo': 'Desfazer', 'act.ok': 'Entendido', 'act.close': 'Fechar',
+        'del.one': '"{name}" excluído', 'del.many': '{n} áudios excluídos',
+        'rec.tooShort': 'Gravação muito curta ou silenciosa; nada foi salvo.', 'rec.saved': 'Gravação salva e selecionada para transmitir.',
+        'imp.loading': 'Importando "{name}"…', 'imp.cut': '"{name}" foi cortado no primeiro minuto.', 'imp.ok': '"{name}" importado.',
+        'imp.fail': 'Não consegui ler "{name}". Use MP3, WAV, M4A ou OGG.',
+        'db.fail': 'Este navegador não permite salvar; os áudios ficam só até fechar a página.',
+        'db.saveFail': 'Não consegui salvar no aparelho; o áudio fica só até fechar a página.',
+        'mic.title': 'Microfone indisponível', 'mic.denied': 'Permita o uso do microfone nas configurações do navegador.',
+        'mic.file': 'Abra a página por https:// ou http://localhost; o navegador bloqueia o microfone em arquivos locais.',
+        'mic.other': 'Não foi possível abrir o microfone.',
+        'cal.title': 'Calibrar faixa', 'cal.finishNow': 'Concluir agora', 'cal.apply': 'Usar esta faixa',
+        'cal.noise': 'Medindo o ruído da sala. Silêncio por 2 segundos…',
+        'cal.listen': 'Agora toque "Tocar sinal de calibração" no transmissor (em Canal). Escutando por até 15 s…',
+        'cal.weak': 'Sinal fraco demais.', 'cal.weakHint': 'Aproxime os aparelhos (até 1 m), ponha o volume no máximo e tente de novo.',
+        'cal.measured': 'Resposta medida: cada barra é a força do sinal acima do ruído.',
+        'cal.result': 'Melhor faixa: <b style="color:var(--green)">{a} a {b}</b> (pior ponto com {m} dB).<br>No transmissor, escolha "Personalizada" com início em {fc}.',
+        'cal.applied': 'Faixa ajustada: {band}. Use a mesma no transmissor.',
+        'band.range': '{a} a {b}',
+        'lang.label': 'Idioma'
+    },
+    en: {
+        'doc.title': 'Ultrasonic Audio Modem',
+        'menu.title': 'ULTRASONIC MODEM',
+        'menu.subtitle': 'Record audio, send it over ultrasound and receive it on another device.',
+        'menu.tx': 'Transmitter', 'menu.txSub': 'Records, stores and sends your audio',
+        'menu.rx': 'Receiver', 'menu.rxSub': 'Listens to the ultrasound and recovers the audio',
+        'menu.note': 'Use the built-in speaker and microphone of each device. Bluetooth speakers and headphones cut off ultrasound.',
+        'nav.menu': 'Menu',
+        'tx.header': 'TX // TRANSMITTER', 'rx.header': 'RX // RECEIVER',
+        'lib.title': 'My audio', 'lib.record': 'Record', 'lib.import': 'Import',
+        'lib.recording': 'Recording', 'lib.recHint': 'Speak close to the microphone. 1 minute limit.',
+        'lib.saveStop': 'Stop and save', 'lib.discard': 'Discard',
+        'lib.empty': 'Record or import audio to get started.',
+        'lib.count1': '{n} clip', 'lib.countN': '{n} clips', 'lib.imported': 'imported',
+        'lib.recName': 'Recording {n}', 'lib.fileName': 'File', 'lib.renamePrompt': 'Audio name:',
+        'tx.title': 'Transmit', 'tx.button': '>> Transmit over ultrasound', 'tx.stop': 'Stop',
+        'tx.stStart': 'Start', 'tx.stAudio': 'Audio', 'tx.stEnd': 'End',
+        'tx.ready': 'Ready', 'tx.preparing': 'Preparing the signal…', 'tx.starting': 'Starting…',
+        'tx.willSend': 'Will transmit:', 'tx.airTime': 'Air time ≈ {t} including start and end signals.',
+        'tx.pick': 'Record or import audio, then tap it to choose.',
+        'tx.phStart': 'Start signal: tells the receiver to start recording', 'tx.phAudio': 'Transmitting "{name}"',
+        'tx.phEnd': 'End signal: tells the receiver to stop',
+        'tx.done': 'Transmission complete', 'tx.calDone': 'Calibration complete', 'tx.stopped': 'Stopped',
+        'tx.calNow': 'Calibration: <span style="color:var(--green)">{f}</span>. Can you still hear it?',
+        'tx.failTitle': 'Could not transmit', 'tx.maxFreq': 'This device plays up to {f}. Choose a lower band.',
+        'ch.title': 'Channel', 'ch.band': 'Band', 'ch.bandStart': 'Band start', 'ch.same': 'Must match the transmitter band.',
+        'ch.volume': 'Output volume', 'ch.volumeHint': 'Set the device volume to maximum and adjust here. Too loud distorts and may become audible.',
+        'ch.calPlay': 'Play calibration signal', 'ch.calPlayHint': 'Play this while the receiver is in "Calibrate": it measures the room and suggests the best band.',
+        'ch.calibrate': 'Calibrate band',
+        'ch.info': 'The audio (0.3–3 kHz) is shifted to {a}–{b}. Start signal at {p}, end signal at {e}.',
+        'ch.audible': ' Test mode: you will hear the signal.', 'ch.kids': ' Children and teenagers may hear a faint hiss.',
+        'ch.above20': ' Many phones lose strength above 20 kHz; if it fails, use Near-ultrasound.',
+        'preset.ultra': 'Ultrasound', 'preset.quase': 'Near-ultrasound', 'preset.robusto': 'Robust', 'preset.teste': 'Audible test', 'preset.custom': 'Custom',
+        'rx.listen': 'Start listening', 'rx.stopListen': 'Stop listening', 'rx.signal': 'Transmitter signal', 'rx.none': 'none',
+        'rx.manual': 'Record manually', 'rx.manualStop': 'Stop and save', 'rx.options': 'Receiving options',
+        'rx.optAuto': 'Detect start and end automatically', 'rx.optHP': 'High-pass filter', 'rx.optHPsub': 'ignores normal room sound',
+        'rx.optDenoise': 'Reduce noise in received audio', 'rx.optAutoplay': 'Play when received',
+        'rx.spectro': 'Spectrogram (time →)', 'rx.legAudio': 'audio band', 'rx.legMarks': 'start and end signals', 'rx.legHP': 'high-pass cutoff',
+        'rx.listTitle': 'Received audio', 'rx.deleteAll': 'Delete all', 'rx.empty': 'Nothing received yet. Start listening and transmit from the other device.',
+        'pill.off': 'Off', 'pill.wait': 'Waiting for start signal', 'pill.manualListen': 'Listening (manual mode)',
+        'pill.recv': 'Receiving audio', 'pill.busy': 'Processing audio…', 'pill.manual': 'Recording manually',
+        'rx.recvName': 'Received {t}', 'how.auto': 'automatic', 'how.auto_noend': 'automatic, no end signal', 'how.manual': 'manual',
+        'rx.gotIt': 'Audio received ({t})', 'rx.tooEarly': 'Signal cut off too early; nothing was saved.',
+        'rx.manualShort': 'Manual recording too short; nothing was saved.', 'rx.procFail': 'Failed to process the received audio.',
+        'rx.rangeTitle': 'Band out of range', 'rx.rangeMsg': 'This device\'s microphone goes up to {f}. Choose a lower band.',
+        'act.play': 'Play', 'act.pause': 'Pause', 'act.rename': 'Rename', 'act.delete': 'Delete', 'act.download': 'Download', 'act.undo': 'Undo', 'act.ok': 'Got it', 'act.close': 'Close',
+        'del.one': '"{name}" deleted', 'del.many': '{n} clips deleted',
+        'rec.tooShort': 'Recording too short or silent; nothing was saved.', 'rec.saved': 'Recording saved and selected for transmission.',
+        'imp.loading': 'Importing "{name}"…', 'imp.cut': '"{name}" was trimmed to the first minute.', 'imp.ok': '"{name}" imported.',
+        'imp.fail': 'Could not read "{name}". Use MP3, WAV, M4A or OGG.',
+        'db.fail': 'This browser does not allow saving; audio is kept only until the page is closed.',
+        'db.saveFail': 'Could not save on this device; the audio is kept only until the page is closed.',
+        'mic.title': 'Microphone unavailable', 'mic.denied': 'Allow microphone access in your browser settings.',
+        'mic.file': 'Open the page via https:// or http://localhost; browsers block the microphone for local files.',
+        'mic.other': 'Could not open the microphone.',
+        'cal.title': 'Calibrate band', 'cal.finishNow': 'Finish now', 'cal.apply': 'Use this band',
+        'cal.noise': 'Measuring room noise. Stay quiet for 2 seconds…',
+        'cal.listen': 'Now press "Play calibration signal" on the transmitter (under Channel). Listening for up to 15 s…',
+        'cal.weak': 'Signal too weak.', 'cal.weakHint': 'Move the devices closer (within 1 m), set the volume to maximum and try again.',
+        'cal.measured': 'Measured response: each bar is the signal strength above the noise.',
+        'cal.result': 'Best band: <b style="color:var(--green)">{a} to {b}</b> (weakest point {m} dB).<br>On the transmitter, choose "Custom" starting at {fc}.',
+        'cal.applied': 'Band set: {band}. Use the same on the transmitter.',
+        'band.range': '{a} to {b}',
+        'lang.label': 'Language'
+    }
+};
+let LANG = (() => {
+    try { const s = localStorage.getItem('modemLang'); if (s === 'pt' || s === 'en') return s; } catch (e) { }
+    return /^pt/i.test(navigator.language || '') ? 'pt' : 'en';
+})();
+function t(key, v) {
+    let s = (I18N[LANG] && I18N[LANG][key]) ?? I18N.pt[key] ?? key;
+    if (v) s = s.replace(/\{(\w+)\}/g, (m, k) => v[k] ?? m);
+    return s;
+}
+const LOCALE = () => LANG === 'pt' ? 'pt-BR' : 'en-US';
+function applyStaticI18n() {
+    document.documentElement.lang = LOCALE();
+    document.title = t('doc.title');
+    document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+    document.querySelectorAll('.lang-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === LANG));
+}
+
+    </script>
     <script>
 /* ================= NÚCLEO DSP (sem DOM) ================= */
 
@@ -598,9 +769,9 @@ if (typeof module !== 'undefined') module.exports = { fft, PRESETS, ssbShift, co
 /* ================= APLICAÇÃO ================= */
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const kHz = f => (f / 1000).toFixed(1).replace('.', ',') + ' kHz';
+const kHz = f => { const v = (f / 1000).toFixed(1); return (LANG === 'pt' ? v.replace('.', ',') : v) + ' kHz'; };
 const fmtDur = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-const fmtDate = t => new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+const fmtDate = ts => new Date(ts).toLocaleString(LOCALE(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 const AC = window.AudioContext || window.webkitAudioContext;
 
 const ICON = {
@@ -615,12 +786,12 @@ const ICON = {
 const config = Object.assign({ preset: 'ultra', customFc: 17000, volume: 0.8 }, (() => { try { return JSON.parse(localStorage.getItem('modemCfg')) || {}; } catch (e) { return {}; } })());
 const carrier = () => config.preset === 'custom' ? config.customFc : PRESETS[config.preset].fc;
 const saveConfig = () => { try { localStorage.setItem('modemCfg', JSON.stringify(config)); } catch (e) { } };
-const bandText = () => `${kHz(carrier() + 100)} a ${kHz(carrier() + 3000)}`;
+const bandText = () => t('band.range', { a: kHz(carrier() + 100), b: kHz(carrier() + 3000) });
 
 function channelHTML(p) {
-    const opts = Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${v.label}${v.fc ? ' (' + kHz(v.fc + 100) + '–' + kHz(v.fc + 3000) + ')' : ''}</option>`).join('');
-    return `<div><label class="lbl" for="${p}Preset">Faixa</label><select id="${p}Preset" class="sel">${opts}</select></div>
-        <div id="${p}CustomBox" class="hidden"><label class="flex justify-between text-sm mb-1 text-slate-400" for="${p}Fc"><span>Início da faixa</span><span class="text-cyan-400 fcVal"></span></label>
+    const opts = Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${t('preset.' + k)}${v.fc ? ' (' + kHz(v.fc + 100) + '–' + kHz(v.fc + 3000) + ')' : ''}</option>`).join('');
+    return `<div><label class="lbl" for="${p}Preset">${t('ch.band')}</label><select id="${p}Preset" class="sel">${opts}</select></div>
+        <div id="${p}CustomBox" class="hidden"><label class="flex justify-between text-sm mb-1 text-slate-400" for="${p}Fc"><span>${t('ch.bandStart')}</span><span class="text-cyan-400 fcVal"></span></label>
             <input type="range" id="${p}Fc" min="8000" max="18500" step="100"></div>
         <p class="text-xs text-slate-400 leading-relaxed chanInfo"></p>`;
 }
@@ -636,10 +807,10 @@ function syncChannelUI() {
         $(p + 'CustomBox').classList.toggle('hidden', config.preset !== 'custom');
     });
     document.querySelectorAll('.fcVal').forEach(e => e.textContent = kHz(fc));
-    document.querySelectorAll('.chanSummary').forEach(e => e.textContent = `${PRESETS[config.preset].label}: ${bandText()}`);
-    let info = `O áudio (0,3–3 kHz) é deslocado para ${kHz(fc + 300)}–${kHz(fc + 3000)}. Sinal de início em ${kHz(fc + 100)}, de fim em ${kHz(fc + 200)}.`;
-    if (fc < 1000 * 15) info += fc < 5000 ? ' Modo de teste: você vai ouvir o sinal.' : ' Crianças e jovens podem ouvir um chiado.';
-    if (fc + 3000 > 20000) info += ' Acima de 20 kHz muitos celulares perdem força; se falhar, use Quase-ultrassom.';
+    document.querySelectorAll('.chanSummary').forEach(e => e.textContent = `${t('preset.' + config.preset)}: ${bandText()}`);
+    let info = t('ch.info', { a: kHz(fc + 300), b: kHz(fc + 3000), p: kHz(fc + 100), e: kHz(fc + 200) });
+    if (fc < 1000 * 15) info += fc < 5000 ? t('ch.audible') : t('ch.kids');
+    if (fc + 3000 > 20000) info += t('ch.above20');
     document.querySelectorAll('.chanInfo').forEach(e => e.textContent = info);
     $('txVolume').value = config.volume; $('txVolumeVal').textContent = Math.round(config.volume * 100) + '%';
 }
@@ -657,22 +828,25 @@ function switchMode(mode) {
     if (rx.active) toggleListen();
     player.pause();
     $(mode === 'tx' ? 'screenTX' : mode === 'rx' ? 'screenRX' : 'screenMenu').classList.remove('hidden');
+    $(mode === 'tx' ? 'langSlotTX' : mode === 'rx' ? 'langSlotRX' : 'langSlotMenu').appendChild($('langSwitch'));
     if (mode === 'rx') resizeCanvases();
     window.scrollTo(0, 0);
 }
 function showMsgBox(title, text) { $('msgBoxTitle').textContent = title; $('msgBoxText').textContent = text; $('msgBox').classList.remove('hidden'); }
 function closeMsgBox() { $('msgBox').classList.add('hidden'); }
-let toastTimer = null;
+let toastTimer = null, toastRender = null;
+/* text e actionLabel podem ser funções: assim o aviso se retraduz se o idioma mudar com ele na tela */
 function toast(text, actionLabel, action, ms = 5000) {
-    $('toastText').textContent = text;
+    const txt = typeof text === 'function' ? text : () => text, lbl = typeof actionLabel === 'function' ? actionLabel : () => actionLabel;
+    toastRender = () => { $('toastText').textContent = txt(); $('toastAction').textContent = lbl() || ''; };
+    toastRender();
     const b = $('toastAction');
     b.classList.toggle('hidden', !actionLabel);
-    b.textContent = actionLabel || '';
     b.onclick = () => { hideToast(); action && action(); };
     $('toast').classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, ms);
 }
-function hideToast() { $('toast').classList.remove('show'); }
+function hideToast() { $('toast').classList.remove('show'); toastRender = null; }
 
 /* Mantém a tela ligada durante escuta/transmissão (Android desliga o microfone com a tela apagada) */
 let wakeLock = null, wakeWanted = 0;
@@ -700,7 +874,7 @@ const DB = {
     },
     req(store, mode, fn) {
         if (!this.db) return Promise.resolve(fn(null));
-        return new Promise((res, rej) => { const t = this.db.transaction(store, mode), q = fn(t.objectStore(store)); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error); });
+        return new Promise((res, rej) => { const tr = this.db.transaction(store, mode), q = fn(tr.objectStore(store)); tr.oncomplete = () => res(q && q.result); tr.onerror = () => rej(tr.error); });
     },
     all(store) { return this.db ? this.req(store, 'readonly', s => s.getAll()) : Promise.resolve([...this.mem[store].values()]); },
     put(store, v) { if (!this.db) { this.mem[store].set(v.id, v); return Promise.resolve(); } return this.req(store, 'readwrite', s => s.put(v)); },
@@ -717,7 +891,7 @@ function softDelete(store, list, items, render, label) {
     const key = newId();
     const timer = setTimeout(() => { pendingDel.delete(key); items.forEach(it => { DB.del(store, it.id); if (it.url) URL.revokeObjectURL(it.url); }); }, 6000);
     pendingDel.set(key, { timer, store, items });
-    toast(label, 'Desfazer', () => {
+    toast(label, () => t('act.undo'), () => {
         clearTimeout(timer); pendingDel.delete(key);
         items.forEach(it => list.push(it)); list.sort((a, b) => b.created - a.created); render();
     }, 6000);
@@ -747,7 +921,7 @@ function refreshPlayButtons() {
     document.querySelectorAll('[data-id] .play').forEach(b => {
         const on = player.item && player.item.id === b.closest('[data-id]').dataset.id && !player.paused;
         b.innerHTML = on ? ICON.pause : ICON.play;
-        b.setAttribute('aria-label', on ? 'Pausar' : 'Ouvir');
+        b.setAttribute('aria-label', on ? t('act.pause') : t('act.play'));
     });
 }
 
@@ -783,10 +957,9 @@ async function makeTap(ctx, onChunk) {
     return node;
 }
 function micError(e) {
-    const m = e && e.name === 'NotAllowedError' ? 'Permita o uso do microfone nas configurações do navegador.' :
-        location.protocol === 'file:' ? 'Abra a página por https:// ou http://localhost; o navegador bloqueia o microfone em arquivos locais.' :
-            'Não foi possível abrir o microfone. ' + (e && e.message || '');
-    showMsgBox('Microfone indisponível', m);
+    const m = e && e.name === 'NotAllowedError' ? t('mic.denied') :
+        location.protocol === 'file:' ? t('mic.file') : t('mic.other') + ' ' + (e && e.message || '');
+    showMsgBox(t('mic.title'), m);
 }
 
 /* =============================== BIBLIOTECA (TX) =============================== */
@@ -797,14 +970,14 @@ function renderLib() {
     ul.innerHTML = lib.map(it => `
         <li class="item selectable ${it.id === selectedId ? 'sel' : ''} ${it.fresh ? 'fresh' : ''}" data-id="${it.id}" role="radio" aria-checked="${it.id === selectedId}" tabindex="0">
             <span class="radio" aria-hidden="true"></span>
-            <button class="ibtn play" aria-label="Ouvir">${ICON.play}</button>
+            <button class="ibtn play" aria-label="${t('act.play')}">${ICON.play}</button>
             <div class="flex-1 min-w-0">
                 <div class="truncate text-white">${esc(it.name)}</div>
-                <div class="text-xs text-slate-500">${fmtDur(it.duration)} · ${fmtDate(it.created)}${it.source === 'arquivo' ? ' · importado' : ''}</div>
+                <div class="text-xs text-slate-500">${fmtDur(it.duration)} · ${fmtDate(it.created)}${it.source === 'arquivo' ? ' · ' + t('lib.imported') : ''}</div>
                 <div class="pbar"><div></div></div>
             </div>
-            <button class="ibtn edit" aria-label="Renomear">${ICON.edit}</button>
-            <button class="ibtn del" aria-label="Excluir">${ICON.del}</button>
+            <button class="ibtn edit" aria-label="${t('act.rename')}" title="${t('act.rename')}">${ICON.edit}</button>
+            <button class="ibtn del" aria-label="${t('act.delete')}" title="${t('act.delete')}">${ICON.del}</button>
         </li>`).join('');
     lib.forEach(it => delete it.fresh);
     ul.querySelectorAll('[data-id]').forEach(li => {
@@ -812,15 +985,15 @@ function renderLib() {
         li.onclick = () => selectItem(it.id);
         li.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectItem(it.id); } };
         li.querySelector('.play').onclick = e => { e.stopPropagation(); togglePlay(it); };
-        li.querySelector('.del').onclick = e => { e.stopPropagation(); if (selectedId === it.id) selectedId = null; softDelete('lib', lib, [it], renderLib, `"${it.name}" excluído`); };
+        li.querySelector('.del').onclick = e => { e.stopPropagation(); if (selectedId === it.id) selectedId = null; softDelete('lib', lib, [it], renderLib, () => t('del.one', { name: it.name })); };
         li.querySelector('.edit').onclick = e => {
             e.stopPropagation();
-            const n = prompt('Nome do áudio:', it.name);
+            const n = prompt(t('lib.renamePrompt'), it.name);
             if (n && n.trim()) { it.name = n.trim().slice(0, 60); DB.put('lib', stripUrl(it)); renderLib(); }
         };
     });
     $('libEmpty').classList.toggle('hidden', lib.length > 0);
-    $('libCount').textContent = lib.length ? `${lib.length} ${lib.length === 1 ? 'áudio' : 'áudios'}` : '';
+    $('libCount').textContent = lib.length ? t(lib.length === 1 ? 'lib.count1' : 'lib.countN', { n: lib.length }) : '';
     if (selectedId && !lib.find(x => x.id === selectedId)) selectedId = null;
     if (!selectedId && lib.length) selectedId = lib[0].id;
     updateSelected(); refreshPlayButtons();
@@ -835,21 +1008,21 @@ function selectItem(id) {
 function updateSelected() {
     const it = lib.find(x => x.id === selectedId);
     $('txSelected').innerHTML = it
-        ? `Vai transmitir: <span class="text-white">${esc(it.name)}</span><br><span class="text-xs">Duração no ar ≈ ${fmtDur(it.duration + 1.3)} com os sinais de início e fim.</span>`
-        : 'Grave ou importe um áudio e toque nele para escolher.';
+        ? `${t('tx.willSend')} <span class="text-white">${esc(it.name)}</span><br><span class="text-xs">${t('tx.airTime', { t: fmtDur(it.duration + 1.3) })}</span>`
+        : t('tx.pick');
     $('btnTx').disabled = !it || !!tx.source;
 }
 async function addToLib(x, name, source) {
     const it = { id: newId(), name, created: Date.now(), duration: x.length / LIB_FS, source, blob: wavBlob(x), fresh: true };
     lib.unshift(it); selectedId = it.id;
-    await DB.put('lib', stripUrl(it)).catch(() => toast('Não consegui salvar no aparelho; o áudio fica só até fechar a página.'));
+    await DB.put('lib', stripUrl(it)).catch(() => toast(() => t('db.saveFail')));
     renderLib();
 }
-const nextRecName = () => { let n = 1; lib.forEach(it => { const m = /^Gravação (\d+)$/.exec(it.name); if (m) n = Math.max(n, +m[1] + 1); }); return 'Gravação ' + n; };
+const nextRecName = () => { let n = 1; lib.forEach(it => { const m = /^(?:Gravação|Recording) (\d+)$/.exec(it.name); if (m) n = Math.max(n, +m[1] + 1); }); return t('lib.recName', { n }); };
 function trimSilence(x, fs) {
     const fr = Math.round(0.02 * fs), thr = 10 ** (-45 / 20);
     let pk = 0; for (let i = 0; i < x.length; i++) pk = Math.max(pk, Math.abs(x[i]));
-    const t = Math.max(thr, pk * 0.02), loud = i => { let m = 0; for (let n = i; n < Math.min(x.length, i + fr); n++) m = Math.max(m, Math.abs(x[n])); return m > t; };
+    const lim = Math.max(thr, pk * 0.02), loud = i => { let m = 0; for (let n = i; n < Math.min(x.length, i + fr); n++) m = Math.max(m, Math.abs(x[n])); return m > lim; };
     let a = 0, b = x.length;
     while (a < b && !loud(a)) a += fr;
     while (b > a && !loud(Math.max(a, b - fr))) b -= fr;
@@ -889,16 +1062,16 @@ async function startRecording() {
 async function stopRecording(save) {
     const r = rec; if (!r) return;
     rec = null;
-    r.stream.getTracks().forEach(t => t.stop());
+    r.stream.getTracks().forEach(tr => tr.stop());
     try { r.src.disconnect(); r.node.disconnect(); } catch (e) { }
     $('recIdle').classList.remove('hidden'); $('recActive').classList.add('hidden');
     if (!save) return;
     const n = r.chunks.reduce((a, c) => a + c.length, 0), x = new Float32Array(n);
     let o = 0; r.chunks.forEach(c => { x.set(c, o); o += c.length; });
-    const t = trimSilence(x, recCtx.sampleRate);
-    if (t.length < 0.3 * recCtx.sampleRate) return toast('Gravação muito curta ou silenciosa; nada foi salvo.');
-    await addToLib(toLibRate(t, recCtx.sampleRate).subarray(0, MAX_SEC * LIB_FS), nextRecName(), 'gravação');
-    toast('Gravação salva e selecionada para transmitir.');
+    const trimmed = trimSilence(x, recCtx.sampleRate);
+    if (trimmed.length < 0.3 * recCtx.sampleRate) return toast(() => t('rec.tooShort'));
+    await addToLib(toLibRate(trimmed, recCtx.sampleRate).subarray(0, MAX_SEC * LIB_FS), nextRecName(), 'gravação');
+    toast(() => t('rec.saved'));
 }
 
 /* Importar arquivos do computador ou celular */
@@ -907,7 +1080,7 @@ async function importFiles(files) {
     const ctx = recCtx = recCtx || new AC();
     for (const f of files) {
         try {
-            toast(`Importando "${f.name}"…`, null, null, 20000);
+            toast(() => t('imp.loading', { name: f.name }), null, null, 20000);
             const ab = await f.arrayBuffer();
             const buf = await new Promise((res, rej) => { const p = ctx.decodeAudioData(ab, res, rej); if (p && p.catch) p.catch(rej); });
             const n = buf.length, x = new Float32Array(n);
@@ -918,10 +1091,10 @@ async function importFiles(files) {
             y = y.subarray(0, MAX_SEC * LIB_FS);
             let pk = 0; for (let i = 0; i < y.length; i++) pk = Math.max(pk, Math.abs(y[i]));
             if (pk > 0) { const g = 0.9 / pk; y = y.map(v => v * g); }
-            await addToLib(y, f.name.replace(/\.[^.]+$/, '').slice(0, 60) || 'Arquivo', 'arquivo');
-            toast(cut ? `"${f.name}" foi cortado no primeiro minuto.` : `"${f.name}" importado.`);
+            await addToLib(y, f.name.replace(/\.[^.]+$/, '').slice(0, 60) || t('lib.fileName'), 'arquivo');
+            toast(() => t(cut ? 'imp.cut' : 'imp.ok', { name: f.name }));
         } catch (e) {
-            toast(`Não consegui ler "${f.name}". Use MP3, WAV, M4A ou OGG.`);
+            toast(() => t('imp.fail', { name: f.name }));
         }
     }
 }
@@ -934,17 +1107,17 @@ async function startTransmission() {
     tx.ctx = tx.ctx || new AC();
     await tx.ctx.resume();
     player.stopAll();
-    $('btnTx').disabled = true; $('txPhase').textContent = 'Preparando o sinal…';
+    $('btnTx').disabled = true; setTxPhase('tx.preparing');
     await new Promise(r => setTimeout(r, 30));
     try {
         const { x } = decodeWav16(await it.blob.arrayBuffer());
         const fs = tx.ctx.sampleRate, fc = carrier();
-        if (fc + 3100 > fs / 2) throw new Error(`Este aparelho toca no máximo ${kHz(fs / 2)}. Escolha uma faixa mais baixa.`);
+        if (fc + 3100 > fs / 2) throw new Error(t('tx.maxFreq', { f: kHz(fs / 2) }));
         const { signal, phases } = buildTxSignal(x, LIB_FS, fs, fc);
         playSignal(signal, { phases, name: it.name, fs });
     } catch (e) {
-        $('txPhase').textContent = 'Pronto'; updateSelected();
-        showMsgBox('Não foi possível transmitir', e.message);
+        setTxPhase('tx.ready'); updateSelected();
+        showMsgBox(t('tx.failTitle'), e.message);
     }
 }
 function playCalibration() {
@@ -979,7 +1152,7 @@ function finishTx(done) {
     $('txIndicator').className = 'w-3 h-3 bg-slate-600 rounded-full';
     ['stStart', 'stAudio', 'stEnd'].forEach(id => $(id).className = 'step' + (done && !wasCal ? ' done' : ''));
     $('txProgress').style.width = done ? '100%' : '0%';
-    $('txPhase').textContent = done ? (wasCal ? 'Calibração concluída' : 'Transmissão concluída') : 'Interrompida';
+    setTxPhase(done ? (wasCal ? 'tx.calDone' : 'tx.done') : 'tx.stopped');
     $('txTime').textContent = '';
     updateSelected();
 }
@@ -990,12 +1163,12 @@ function txMonitor() {
     $('txProgress').style.width = Math.max(0, Math.min(100, pos / p.total * 100)) + '%';
     if (p.cal) {
         const i = Math.floor(pos / p.cal.step), f = p.cal.freqs[Math.max(0, i) % p.cal.freqs.length];
-        $('txPhase').innerHTML = pos < 0 ? 'Iniciando…' : `Calibração: <span style="color:var(--green)">${kHz(f)}</span>. Você ainda ouve?`;
+        $('txPhase').innerHTML = pos < 0 ? t('tx.starting') : t('tx.calNow', { f: kHz(f) });
         return;
     }
     const ph = p.phases, st = pos < ph.voice ? 0 : pos < ph.end ? 1 : 2;
     ['stStart', 'stAudio', 'stEnd'].forEach((id, i) => $(id).className = 'step' + (i === st ? ' on' : i < st ? ' done' : ''));
-    $('txPhase').textContent = ['Sinal de início: avisa o receptor para começar a gravar', `Transmitindo "${p.name}"`, 'Sinal de fim: avisa o receptor para parar'][st];
+    $('txPhase').textContent = [t('tx.phStart'), t('tx.phAudio', { name: p.name }), t('tx.phEnd')][st];
     $('txTime').textContent = st === 1 ? `${fmtDur((pos - ph.voice) / p.fs)} / ${fmtDur((ph.end - ph.voice) / p.fs)}` : '';
 }
 
@@ -1008,11 +1181,11 @@ async function toggleListen() {
         if (rx.manual) toggleManual();
         rx.active = false;
         cancelAnimationFrame(rx.anim);
-        try { rx.stream.getTracks().forEach(t => t.stop()); rx.ctx.close(); } catch (e) { }
+        try { rx.stream.getTracks().forEach(tr => tr.stop()); rx.ctx.close(); } catch (e) { }
         rx.ctx = null; rx.hp = []; keepAwake(false);
-        $('btnListen').textContent = 'Ativar escuta'; $('btnManual').disabled = true;
+        $('btnListen').textContent = t('rx.listen'); $('btnManual').disabled = true;
         $('rxIndicator').className = 'w-3 h-3 bg-slate-600 rounded-full';
-        setPill('', 'Desligado'); $('rxTimer').textContent = ''; $('rxSig').style.width = '0'; $('rxSigVal').textContent = '–';
+        setPill('', 'pill.off'); $('rxTimer').textContent = ''; $('rxSig').style.width = '0'; $('rxSigVal').textContent = '–';
         return;
     }
     try {
@@ -1034,11 +1207,11 @@ async function toggleListen() {
         rx.hp[1].connect(tap);
         rx.active = true;
         keepAwake(true);
-        $('btnListen').textContent = 'Parar escuta'; $('btnManual').disabled = false;
+        $('btnListen').textContent = t('rx.stopListen'); $('btnManual').disabled = false;
         $('rxIndicator').className = 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
-        setPill('wait', $('optAuto').checked ? 'Aguardando sinal de início' : 'Escutando (modo manual)');
+        setPill('wait', waitKey());
         resizeCanvases(); drawLoop();
-        if (carrier() + 3100 > rx.fs / 2) showMsgBox('Faixa fora do alcance', `O microfone deste aparelho vai até ${kHz(rx.fs / 2)}. Escolha uma faixa mais baixa.`);
+        if (carrier() + 3100 > rx.fs / 2) showMsgBox(t('rx.rangeTitle'), t('rx.rangeMsg', { f: kHz(rx.fs / 2) }));
     } catch (e) { micError(e); }
 }
 function applyHP() {
@@ -1050,9 +1223,10 @@ function applyHP() {
 $('optHP').addEventListener('change', applyHP);
 $('optAuto').addEventListener('change', () => {
     if (rx.det) rx.det.reset();
-    if (rx.active && !rx.manual) setPill('wait', $('optAuto').checked ? 'Aguardando sinal de início' : 'Escutando (modo manual)');
+    if (rx.active && !rx.manual) setPill('wait', waitKey());
 });
-function setPill(cls, text) { $('rxPill').className = 'pill ' + cls; $('rxPillText').textContent = text; }
+function setPill(cls, key) { rx.pill = [cls, key]; $('rxPill').className = 'pill ' + cls; $('rxPillText').textContent = t(key); }
+const waitKey = () => $('optAuto').checked ? 'pill.wait' : 'pill.manualListen';
 
 const SPEC = { re: new Float64Array(SPEC_N), im: new Float64Array(SPEC_N), pw: new Float64Array(SPEC_N / 2), win: Float64Array.from({ length: SPEC_N }, (_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / SPEC_N)) };
 function spectrum(a) {
@@ -1070,7 +1244,7 @@ function handleChunk(a) {
     const ev = rx.det.feed(start, a.length, spec);
     const db = Math.max(0, Math.min(40, rx.det.pilotDb));
     $('rxSig').style.width = (db / 40 * 100) + '%';
-    $('rxSigVal').textContent = db > 6 ? db.toFixed(0) + ' dB' : 'nenhum';
+    $('rxSigVal').textContent = db > 6 ? db.toFixed(0) + ' dB' : t('rx.none');
     let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * a[i];
     $('rxLevel').textContent = (10 * Math.log10(s / a.length + 1e-12)).toFixed(0) + ' dBFS';
     if (rx.manual) {
@@ -1082,68 +1256,70 @@ function handleChunk(a) {
     if (!$('optAuto').checked) { rx.det.reset(); return; }
     if (rx.det.state === 'rx') $('rxTimer').textContent = fmtDur((rx.ring.end - rx.det.onset) / fs);
     if (!ev) return;
-    if (ev.event === 'start') { setPill('recv', 'Recebendo áudio'); $('rxIndicator').className = 'w-3 h-3 rounded-full animate-pulse'; $('rxIndicator').style.background = 'var(--green)'; return; }
+    if (ev.event === 'start') { setPill('recv', 'pill.recv'); $('rxIndicator').className = 'w-3 h-3 rounded-full animate-pulse'; $('rxIndicator').style.background = 'var(--green)'; return; }
     $('rxTimer').textContent = ''; $('rxIndicator').style.background = '';
     $('rxIndicator').className = 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
-    if ((ev.to - ev.voiceFrom) < 0.5 * fs) { setPill('wait', 'Aguardando sinal de início'); if (ev.event !== 'end') toast('Sinal interrompido cedo demais; nada foi salvo.'); return; }
-    processReceived(ev.from, ev.to, (ev.voiceFrom - ev.from) / fs, ev.event === 'end' ? 'automático' : 'automático, sem sinal de fim');
+    if ((ev.to - ev.voiceFrom) < 0.5 * fs) { setPill('wait', 'pill.wait'); if (ev.event !== 'end') toast(() => t('rx.tooEarly')); return; }
+    processReceived(ev.from, ev.to, (ev.voiceFrom - ev.from) / fs, ev.event === 'end' ? 'auto' : 'auto_noend');
 }
 function toggleManual() {
     if (!rx.active) return;
     if (!rx.manual) {
         rx.manual = { start: Math.max(rx.ring.oldest(), rx.ring.end - Math.round(0.3 * rx.fs)) };
         rx.det.reset();
-        $('btnManual').textContent = 'Parar e salvar';
-        setPill('manual', 'Gravando manualmente');
+        $('btnManual').textContent = t('rx.manualStop');
+        setPill('manual', 'pill.manual');
     } else {
         const s = rx.manual.start, e = rx.ring.end;
         rx.manual = null; rx.det.reset();
-        $('btnManual').textContent = 'Gravar manualmente'; $('rxTimer').textContent = '';
-        if (e - s < 0.8 * rx.fs) { setPill('wait', 'Aguardando sinal de início'); return toast('Gravação manual muito curta; nada foi salvo.'); }
+        $('btnManual').textContent = t('rx.manual'); $('rxTimer').textContent = '';
+        if (e - s < 0.8 * rx.fs) { setPill('wait', waitKey()); return toast(() => t('rx.manualShort')); }
         processReceived(s, e, 0, 'manual');
     }
 }
 function processReceived(from, to, noiseSec, how) {
-    setPill('busy', 'Processando áudio…');
+    setPill('busy', 'pill.busy');
     const seg = rx.ring.copy(from, to - from), fs = rx.fs, fc = carrier(), clean = $('optDenoise').checked, sig = rx.det.pilotDb;
     setTimeout(async () => {
         try {
             const y = demodulate(seg, fs, fc, noiseSec, clean);
-            const t = new Date();
-            const it = { id: newId(), name: 'Recebido ' + t.toLocaleTimeString('pt-BR'), created: t.getTime(), duration: y.length / LIB_FS, how, blob: wavBlob(y), fresh: true };
+            const now = new Date();
+            const it = { id: newId(), name: t('rx.recvName', { t: now.toLocaleTimeString(LOCALE()) }), created: now.getTime(), duration: y.length / LIB_FS, how, blob: wavBlob(y), fresh: true };
             rxItems.unshift(it);
             await DB.put('rx', stripUrl(it)).catch(() => { });
             renderRx();
-            toast(`Áudio recebido (${fmtDur(it.duration)})`, 'Ouvir', () => togglePlay(it));
+            toast(() => t('rx.gotIt', { t: fmtDur(it.duration) }), () => t('act.play'), () => togglePlay(it));
             if ($('optAutoplay').checked) togglePlay(it);
-        } catch (e) { console.error(e); toast('Falha ao processar o áudio recebido.'); }
-        if (rx.active) setPill('wait', $('optAuto').checked ? 'Aguardando sinal de início' : 'Escutando (modo manual)');
+        } catch (e) { console.error(e); toast(() => t('rx.procFail')); }
+        if (rx.active) setPill('wait', waitKey());
     }, 30);
 }
 function renderRx() {
     $('rxList').innerHTML = rxItems.map(it => `
         <li class="item ${it.fresh ? 'fresh' : ''}" data-id="${it.id}">
-            <button class="ibtn play" aria-label="Ouvir">${ICON.play}</button>
+            <button class="ibtn play" aria-label="${t('act.play')}">${ICON.play}</button>
             <div class="flex-1 min-w-0">
                 <div class="truncate text-white">${esc(it.name)}</div>
-                <div class="text-xs text-slate-500">${fmtDur(it.duration)} · ${fmtDate(it.created)} · ${esc(it.how || '')}</div>
+                <div class="text-xs text-slate-500">${fmtDur(it.duration)} · ${fmtDate(it.created)} · ${esc(howText(it.how))}</div>
                 <div class="pbar"><div></div></div>
             </div>
-            <a class="ibtn down" aria-label="Baixar" download="${esc(it.name.replace(/[:/\\]/g, '-'))}.wav">${ICON.down}</a>
-            <button class="ibtn del" aria-label="Excluir">${ICON.del}</button>
+            <a class="ibtn down" aria-label="${t('act.download')}" title="${t('act.download')}" download="${esc(it.name.replace(/[:/\\]/g, '-'))}.wav">${ICON.down}</a>
+            <button class="ibtn del" aria-label="${t('act.delete')}" title="${t('act.delete')}">${ICON.del}</button>
         </li>`).join('');
     rxItems.forEach(it => delete it.fresh);
     $('rxList').querySelectorAll('[data-id]').forEach(li => {
         const it = rxItems.find(x => x.id === li.dataset.id);
         li.querySelector('.play').onclick = () => togglePlay(it);
         li.querySelector('.down').href = urlOf(it);
-        li.querySelector('.del').onclick = () => softDelete('rx', rxItems, [it], renderRx, `"${it.name}" excluído`);
+        li.querySelector('.del').onclick = () => softDelete('rx', rxItems, [it], renderRx, () => t('del.one', { name: it.name }));
     });
     $('rxEmpty').classList.toggle('hidden', rxItems.length > 0);
     $('btnClearRx').classList.toggle('hidden', rxItems.length < 2);
     refreshPlayButtons();
 }
-function deleteAllRx() { softDelete('rx', rxItems, rxItems.slice(), renderRx, `${rxItems.length} áudios excluídos`); }
+function deleteAllRx() { const n = rxItems.length; softDelete('rx', rxItems, rxItems.slice(), renderRx, () => t('del.many', { n })); }
+const HOW_OLD = { 'automático': 'auto', 'automático, sem sinal de fim': 'auto_noend' };
+function howText(h) { h = HOW_OLD[h] || h || ''; return I18N.pt['how.' + h] ? t('how.' + h) : h; }
 
 /* ---------- Calibração ---------- */
 const calib = {
@@ -1192,12 +1368,12 @@ async function startCalibration() {
     calib.phase = 'noise'; applyHP();
     $('calModal').classList.remove('hidden'); $('calApply').classList.add('hidden'); $('calFinish').classList.remove('hidden');
     $('calResult').textContent = '';
-    $('calStatus').textContent = 'Medindo o ruído da sala. Silêncio por 2 segundos…';
+    setCalStatus('cal.noise');
     clearTimeout(calib.timer);
     calib.timer = setTimeout(() => {
         calib.noise = calib.noise.map(v => v / Math.max(1, calib.n));
         calib.phase = 'listen';
-        $('calStatus').textContent = 'Agora toque "Tocar sinal de calibração" no transmissor (em Canal). Escutando por até 15 s…';
+        setCalStatus('cal.listen');
         calib.timer = setTimeout(finishCalibration, 15000);
     }, 2000);
 }
@@ -1209,27 +1385,27 @@ function finishCalibration() {
     calib.draw(r);
     $('calFinish').classList.add('hidden');
     if (!r || r.m < 10) {
-        $('calStatus').textContent = 'Sinal fraco demais.';
-        $('calResult').textContent = 'Aproxime os aparelhos (até 1 m), ponha o volume no máximo e tente de novo.';
+        setCalStatus('cal.weak'); calib.resultKey = 'weak';
+        $('calResult').textContent = t('cal.weakHint');
         return;
     }
-    $('calStatus').textContent = 'Resposta medida: cada barra é a força do sinal acima do ruído.';
-    $('calResult').innerHTML = `Melhor faixa: <b style="color:var(--green)">${kHz(r.fc + 100)} a ${kHz(r.fc + 3000)}</b> (pior ponto com ${r.m.toFixed(0)} dB).<br>No transmissor, escolha "Personalizada" com início em ${kHz(r.fc)}.`;
+    setCalStatus('cal.measured'); calib.resultKey = 'ok';
+    renderCalResult();
     $('calApply').classList.remove('hidden');
 }
 function applyCalibration() {
     if (!calib.result) return;
     config.preset = 'custom'; config.customFc = calib.result.fc;
     channelChanged(); closeCalibration();
-    toast(`Faixa ajustada: ${bandText()}. Use a mesma no transmissor.`);
+    toast(() => t('cal.applied', { band: bandText() }));
 }
 function closeCalibration() { clearTimeout(calib.timer); calib.phase = null; applyHP(); $('calModal').classList.add('hidden'); }
 
 /* ---------- Espectrograma ---------- */
 const rxCanvas = $('rxCanvas'), rxG = rxCanvas.getContext('2d'), guides = $('rxGuides'), gG = guides.getContext('2d');
 const PALETTE = Array.from({ length: 256 }, (_, i) => {
-    const t = i / 255;
-    const r = 255 * Math.max(0, Math.min(1, (t - 0.65) * 3)), g = 255 * Math.max(0, Math.min(1, (t - 0.3) * 1.8)), b = 255 * Math.max(0, Math.min(1, t * 2.2 - Math.max(0, t - 0.7) * 2));
+    const v = i / 255;
+    const r = 255 * Math.max(0, Math.min(1, (v - 0.65) * 3)), g = 255 * Math.max(0, Math.min(1, (v - 0.3) * 1.8)), b = 255 * Math.max(0, Math.min(1, v * 2.2 - Math.max(0, v - 0.7) * 2));
     return `rgb(${r | 0},${g | 0},${b | 0})`;
 });
 const viewTop = () => Math.min(22050, rx.fs / 2);
@@ -1271,15 +1447,44 @@ function drawLoop() {
     }
 }
 
+
+/* ---------- Troca de idioma ---------- */
+let txPhaseKey = 'tx.ready';
+function setTxPhase(key) { txPhaseKey = key; $('txPhase').textContent = t(key); }
+function setCalStatus(key) { calib.statusKey = key; $('calStatus').textContent = t(key); }
+function renderCalResult() {
+    const r = calib.result; if (!r) return;
+    if (calib.resultKey === 'weak') { $('calResult').textContent = t('cal.weakHint'); return; }
+    $('calResult').innerHTML = t('cal.result', { a: kHz(r.fc + 100), b: kHz(r.fc + 3000), m: r.m.toFixed(0), fc: kHz(r.fc) });
+}
+function setLang(l) {
+    if (l === LANG) return;
+    LANG = l;
+    try { localStorage.setItem('modemLang', l); } catch (e) { }
+    applyAllText();
+}
+function applyAllText() {
+    applyStaticI18n();
+    $('txChannelBody').innerHTML = channelHTML('tx'); $('rxChannelBody').innerHTML = channelHTML('rx');
+    bindChannel('tx'); bindChannel('rx'); syncChannelUI();
+    renderLib(); renderRx();
+    if (!tx.plan) setTxPhase(txPhaseKey);
+    $('btnListen').textContent = t(rx.active ? 'rx.stopListen' : 'rx.listen');
+    $('btnManual').textContent = t(rx.manual ? 'rx.manualStop' : 'rx.manual');
+    if (rx.pill) setPill(rx.pill[0], rx.pill[1]); else setPill('', 'pill.off');
+    if (!rx.active) $('rxSigVal').textContent = '–';
+    if (calib.statusKey) $('calStatus').textContent = t(calib.statusKey);
+    renderCalResult();
+    if (toastRender) toastRender();
+}
+
 /* ---------- Início ---------- */
-$('txChannelBody').innerHTML = channelHTML('tx');
-$('rxChannelBody').innerHTML = channelHTML('rx');
-bindChannel('tx'); bindChannel('rx');
-syncChannelUI();
+$('langSlotMenu').appendChild($('langSwitch'));
+applyAllText();
 if (window.matchMedia('(min-width: 1024px)').matches) { $('txChannel').open = true; $('rxChannel').open = true; $('rxOptions').open = true; }
 (async () => {
     const ok = await DB.open();
-    if (!ok) toast('Este navegador não permite salvar; os áudios ficam só até fechar a página.');
+    if (!ok) toast(() => t('db.fail'));
     const [a, b] = await Promise.all([DB.all('lib'), DB.all('rx')]).catch(() => [[], []]);
     lib.push(...(a || []).sort((p, q) => q.created - p.created));
     rxItems.push(...(b || []).sort((p, q) => q.created - p.created));
