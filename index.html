@@ -3,531 +3,693 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receptor de Áudio Ultrasônico - Feira de Ciências</title>
+    <title>Modem FSK - Feira de Ciências</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #020617; /* Slate 950 */
+            --panel-bg: #0f172a; /* Slate 900 */
+            --neon-green: #39ff14;
+            --neon-blue: #00f3ff;
+            --terminal-green: #4af626;
+        }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020617; /* Slate 950 - Darker for receiver */
-            color: #f8fafc;
-            background-image: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 70%);
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg-color);
+            color: #e2e8f0;
+            background-image: 
+                linear-gradient(rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.9)),
+                radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
+        /* Estilização Hacker/Sci-Fi */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(56, 189, 248, 0.15); /* Sky blue subtle border */
-            border-radius: 1rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.05), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .btn-neon-green {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.2), inset 0 0 10px rgba(57, 255, 20, 0.1);
+            transition: all 0.2s ease-in-out;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0f172a;
-            border-radius: 4px;
+        .btn-neon-green:hover {
+            background: rgba(57, 255, 20, 0.1);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.4), inset 0 0 15px rgba(57, 255, 20, 0.2);
+            text-shadow: 0 0 5px var(--neon-green);
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #38bdf8;
-            border-radius: 4px;
+
+        .btn-neon-blue {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(0, 243, 255, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-neon-blue:hover {
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
+            text-shadow: 0 0 5px var(--neon-blue);
         }
 
         .terminal-text {
-            color: #34d399; /* Emerald 400 */
-            text-shadow: 0 0 5px rgba(52, 211, 153, 0.4);
+            color: var(--terminal-green);
+            text-shadow: 0 0 4px rgba(74, 246, 38, 0.5);
         }
 
-        .pulse-ring {
-            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-green); }
+
+        /* Range Slider Customizado */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
         }
 
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            80% { transform: scale(2); opacity: 0; }
-            100% { transform: scale(2); opacity: 0; }
-        }
+        /* Utilitários de visibilidade */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .bit-box {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 32px;
-            margin: 2px;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .bit-0 { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
-        .bit-1 { background-color: #0369a1; color: #bae6fd; border: 1px solid #0284c7; box-shadow: 0 0 8px rgba(14, 165, 233, 0.5); }
+        /* Modal Box */
+        .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 md:p-8">
+<body class="p-4 md:p-8">
 
-    <header class="mb-6 flex flex-col md:flex-row items-center justify-between border-b border-slate-800 pb-4">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-400 flex items-center gap-3">
-                <svg class="w-10 h-10 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
-                Receptor FSK (Demodulador)
+    <!-- TELA INICIAL (MENU) -->
+    <div id="screenMenu" class="flex-grow flex flex-col items-center justify-center fade-in">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4" style="color: var(--neon-blue); text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);">
+                MODEM FSK ULTRASSÔNICO
             </h1>
-            <p class="text-slate-400 mt-2 text-sm max-w-xl">
-                Escuta frequências ultrassônicas e converte de volta para texto.
-                Requer acesso ao microfone.
-            </p>
+            <p class="text-slate-400 text-lg md:text-xl tracking-widest uppercase">Protocolo Experimental • Feira de Ciências</p>
         </div>
-        
-        <div class="mt-4 md:mt-0">
-            <button id="btnMic" class="relative group bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center gap-3">
-                <div id="micIndicator" class="w-3 h-3 rounded-full bg-red-500"></div>
-                <span id="micText">Ligar Microfone</span>
-                <div id="micPulse" class="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-red-500 pulse-ring hidden"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+            <button onclick="switchMode('tx')" class="btn-neon-green flex flex-col items-center p-10 rounded-xl group relative overflow-hidden">
+                <svg class="w-20 h-20 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+                <span class="text-2xl font-bold uppercase tracking-wider">Modo Transmissor</span>
+                <span class="text-sm mt-3 text-slate-400 group-hover:text-slate-300">Modula texto em pulsos sonoros</span>
+            </button>
+
+            <button onclick="switchMode('rx')" class="btn-neon-blue flex flex-col items-center p-10 rounded-xl group relative overflow-hidden">
+                <svg class="w-20 h-20 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                <span class="text-2xl font-bold uppercase tracking-wider">Modo Receptor</span>
+                <span class="text-sm mt-3 text-slate-400 group-hover:text-slate-300">Escuta e demodula os bipes de volta</span>
             </button>
         </div>
-    </header>
+    </div>
 
-    <main class="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <div class="lg:col-span-4 space-y-6">
-            <div class="glass-panel p-6">
-                <h2 class="text-lg font-semibold mb-4 text-sky-300 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    Sintonia do Receptor
+    <!-- TELA TRANSMISSOR -->
+    <div id="screenTX" class="hidden flex-grow flex-col max-w-6xl mx-auto w-full fade-in">
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
+            <div>
+                <h2 class="text-2xl font-bold text-green-400 flex items-center gap-2 tracking-widest">
+                    <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                    TX // TRANSMISSOR FSK
                 </h2>
+            </div>
+            <button onclick="switchMode('menu')" class="px-4 py-2 border border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 rounded transition uppercase text-sm">
+                [ Voltar ao Menu ]
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Configurações TX -->
+            <div class="lg:col-span-4 glass-panel p-6 space-y-6">
+                <h3 class="text-lg font-bold text-slate-300 border-b border-slate-700 pb-2 uppercase tracking-wide">Parâmetros do Modem</h3>
                 
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2 flex justify-between">
-                            <span>Frequência Base (Bit 0)</span>
-                            <span id="freqValue" class="text-sky-400 font-mono">10000 Hz</span>
-                        </label>
-                        <input type="range" id="baseFreq" min="10000" max="20000" step="100" value="10000" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-sky-500">
-                        <div class="flex justify-between text-[10px] text-slate-500 mt-1">
-                            <span>10 kHz</span>
-                            <span>(Bit 1 = Base + 500Hz)</span>
-                            <span>20 kHz</span>
-                        </div>
-                    </div>
+                <div>
+                    <label class="flex justify-between text-sm mb-2 text-slate-400">
+                        <span>Frequência Base (Bit 0/Space)</span>
+                        <span id="txBaseFreqVal" class="text-green-400">15000 Hz</span>
+                    </label>
+                    <input type="range" id="txBaseFreq" min="10000" max="20000" step="100" value="15000" oninput="syncConfigUI()">
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2 flex justify-between">
-                            <span>Velocidade (Baud Rate)</span>
-                            <span id="baudValue" class="text-sky-400 font-mono">10 bps</span>
-                        </label>
-                        <input type="range" id="baudRate" min="5" max="100" step="1" value="10" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-sky-500">
-                        <p class="text-xs text-slate-500 mt-1">Deve ser exatamente igual ao do transmissor.</p>
-                    </div>
+                <div>
+                    <label class="flex justify-between text-sm mb-2 text-slate-400">
+                        <span>Offset Freq (Bit 1/Mark)</span>
+                        <span id="txOffsetVal" class="text-green-400">+ 500 Hz</span>
+                    </label>
+                    <input type="range" id="txOffset" min="100" max="1000" step="50" value="500" oninput="syncConfigUI()">
+                </div>
 
-                    <div class="pt-4 border-t border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-slate-400">Nível de Sinal (Threshold)</span>
-                            <span id="signalLevel" class="text-xs font-mono text-slate-500">0%</span>
-                        </div>
-                        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden relative">
-                            <div id="signalBar" class="h-full bg-slate-600 w-0 transition-all duration-75"></div>
-                            <div class="absolute top-0 bottom-0 border-l border-red-500 z-10" style="left: 40%;" title="Threshold de Ativação"></div>
-                        </div>
-                        <p class="text-[10px] text-slate-500 mt-1 text-center">Barras acima da linha vermelha ativam o demodulador.</p>
-                    </div>
+                <div>
+                    <label class="flex justify-between text-sm mb-2 text-slate-400">
+                        <span>Baud Rate (Velocidade)</span>
+                        <span id="txBaudVal" class="text-green-400">20 bps</span>
+                    </label>
+                    <input type="range" id="txBaud" min="5" max="100" step="1" value="20" oninput="syncConfigUI()">
+                    <p class="text-xs text-slate-500 mt-2">Duração do bit: <span id="txBitTime">50.0</span> ms</p>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 h-64 flex flex-col">
-                <h2 class="text-lg font-semibold mb-3 text-sky-300 flex items-center gap-2 border-b border-slate-700 pb-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m14-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                    Buffer de Bits (Último Byte)
-                </h2>
+            <!-- Entrada e Status TX -->
+            <div class="lg:col-span-8 glass-panel p-6 flex flex-col">
+                <h3 class="text-lg font-bold text-slate-300 border-b border-slate-700 pb-2 uppercase tracking-wide mb-4">Dados de Transmissão (Payload)</h3>
                 
-                <div class="flex-grow flex flex-col items-center justify-center">
-                    <div id="bitContainer" class="flex flex-wrap justify-center gap-1 min-h-[40px]">
-                        <span class="text-slate-600 text-sm italic">Aguardando sinal...</span>
-                    </div>
-                    <div class="mt-6 text-center">
-                        <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Caractere Decodificado</div>
-                        <div id="lastChar" class="text-4xl font-mono font-bold text-white h-12 flex items-center justify-center">_</div>
-                    </div>
+                <textarea id="txInput" rows="4" class="w-full bg-slate-950 border border-slate-700 rounded p-4 text-white focus:outline-none focus:border-green-500 resize-none font-mono text-lg" placeholder="Digite a mensagem..."></textarea>
+                
+                <div class="mt-4 flex gap-4">
+                    <button id="btnTxStart" onclick="startTransmission()" class="flex-1 btn-neon-green font-bold py-3 px-4 rounded text-lg uppercase tracking-wider">
+                        >> Transmitir
+                    </button>
+                    <button id="btnTxStop" onclick="stopTransmission()" disabled class="px-6 border border-slate-700 text-slate-500 rounded font-bold uppercase disabled:opacity-50 hover:bg-slate-800 hover:text-white transition">
+                        Parar (Halt)
+                    </button>
+                </div>
+
+                <div class="mt-6 flex-grow border border-slate-800 bg-slate-950 rounded p-4 relative overflow-hidden">
+                    <div class="text-xs text-slate-500 absolute top-2 right-2">STATUS.SYS</div>
+                    <div id="txStatusTerminal" class="terminal-text text-sm h-32 overflow-y-auto whitespace-pre-wrap">Aguardando payload para modulação UART...</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="lg:col-span-8 space-y-6 flex flex-col">
-            
-            <div class="glass-panel p-6 flex-shrink-0">
-                <h2 class="text-lg font-semibold mb-3 text-sky-300 flex items-center gap-2 border-b border-slate-700 pb-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                    Espectro Focado (8kHz - 22kHz)
+    <!-- TELA RECEPTOR -->
+    <div id="screenRX" class="hidden flex-grow flex-col max-w-6xl mx-auto w-full fade-in">
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
+            <div>
+                <h2 class="text-2xl font-bold text-cyan-400 flex items-center gap-2 tracking-widest">
+                    <span id="rxStatusIndicator" class="w-3 h-3 bg-slate-600 rounded-full"></span>
+                    RX // RECEPTOR & DEMODULADOR
                 </h2>
+            </div>
+            <button onclick="switchMode('menu')" class="px-4 py-2 border border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 rounded transition uppercase text-sm">
+                [ Voltar ao Menu ]
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+            <!-- Configurações RX -->
+            <div class="lg:col-span-4 glass-panel p-6 space-y-6 flex flex-col">
+                <h3 class="text-lg font-bold text-slate-300 border-b border-slate-700 pb-2 uppercase tracking-wide">Sintonia (Tuning)</h3>
+                <p class="text-xs text-slate-400 mb-2">A sintonia DEVE ser idêntica ao Transmissor para correta demodulação UART.</p>
                 
-                <div class="relative w-full h-48 bg-slate-950 rounded-lg border border-slate-800 overflow-hidden">
-                    <canvas id="receiverCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
-                    
-                    <!-- Marcadores de Frequência -->
-                    <div id="markF0" class="absolute top-0 bottom-0 border-l border-dashed border-slate-400 opacity-70 flex flex-col justify-end pb-1 pl-1 pointer-events-none" style="left: 20%;">
-                        <span class="text-[10px] text-slate-400 font-bold bg-slate-900/80 px-1 rounded">Bit 0</span>
-                    </div>
-                    <div id="markF1" class="absolute top-0 bottom-0 border-l border-dashed border-sky-400 opacity-70 flex flex-col justify-end pb-1 pl-1 pointer-events-none" style="left: 25%;">
-                        <span class="text-[10px] text-sky-400 font-bold bg-slate-900/80 px-1 rounded">Bit 1</span>
-                    </div>
+                <div>
+                    <label class="flex justify-between text-sm mb-2 text-slate-400">
+                        <span>Frequência Base (Bit 0)</span>
+                        <span id="rxBaseFreqVal" class="text-cyan-400">15000 Hz</span>
+                    </label>
+                    <input type="range" id="rxBaseFreq" min="10000" max="20000" step="100" value="15000" oninput="syncConfigUI()">
+                </div>
+
+                <div>
+                    <label class="flex justify-between text-sm mb-2 text-slate-400">
+                        <span>Offset Freq (Bit 1)</span>
+                        <span id="rxOffsetVal" class="text-cyan-400">+ 500 Hz</span>
+                    </label>
+                    <input type="range" id="rxOffset" min="100" max="1000" step="50" value="500" oninput="syncConfigUI()">
+                </div>
+
+                <div>
+                    <label class="flex justify-between text-sm mb-2 text-slate-400">
+                        <span>Baud Rate Esperado</span>
+                        <span id="rxBaudVal" class="text-cyan-400">20 bps</span>
+                    </label>
+                    <input type="range" id="rxBaud" min="5" max="100" step="1" value="20" oninput="syncConfigUI()">
+                </div>
+
+                <div class="mt-auto pt-6">
+                    <button id="btnRxMic" onclick="toggleMic()" class="w-full btn-neon-blue font-bold py-4 rounded text-lg uppercase tracking-wider flex justify-center items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                        <span id="txtBtnMic">Ativar Escuta (Mic)</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 flex-grow flex flex-col min-h-[250px]">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-3">
-                    <h2 class="text-lg font-semibold text-sky-300 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        Console de Mensagens
-                    </h2>
-                    <button id="btnClear" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1 rounded transition">Limpar</button>
+            <!-- Visualizador e Terminal RX -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Analisador de Espectro -->
+                <div class="glass-panel p-4 h-48 relative flex-shrink-0">
+                    <div class="absolute top-2 left-4 text-xs text-slate-400 uppercase z-10">Análise Espectral de Alta Resolução (FFT 512)</div>
+                    <canvas id="rxCanvas" class="w-full h-full bg-slate-950 rounded"></canvas>
+                    <div id="rxMarker0" class="absolute top-0 bottom-0 border-l border-slate-500 opacity-50 flex flex-col justify-end pb-1 pl-1" style="left: 0%;"><span class="text-[10px] bg-slate-900 px-1 text-slate-300">f0</span></div>
+                    <div id="rxMarker1" class="absolute top-0 bottom-0 border-l border-cyan-500 opacity-50 flex flex-col justify-end pb-1 pl-1" style="left: 0%;"><span class="text-[10px] bg-slate-900 px-1 text-cyan-300">f1</span></div>
                 </div>
-                
-                <div id="consoleOutput" class="flex-grow bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono terminal-text text-base md:text-lg leading-relaxed overflow-y-auto custom-scrollbar break-words whitespace-pre-wrap"></div>
-            </div>
 
+                <!-- Terminal -->
+                <div class="glass-panel p-4 flex-grow flex flex-col min-h-[250px]">
+                    <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
+                        <span class="text-sm font-bold text-slate-300 uppercase">Terminal de Saída (STDOUT)</span>
+                        <div class="flex items-center gap-4 text-xs">
+                            <span id="rxStateDisplay" class="text-slate-500 font-bold">STATE: IDLE</span>
+                            <button onclick="document.getElementById('rxTerminal').innerHTML=''" class="text-slate-500 hover:text-white transition">Limpar</button>
+                        </div>
+                    </div>
+                    <div id="rxTerminal" class="flex-grow bg-slate-950 rounded p-4 text-xl terminal-text overflow-y-auto whitespace-pre-wrap break-all custom-scrollbar"></div>
+                </div>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Caixa de Mensagem Customizada (Substituto do alert) -->
+    <div id="msgBox" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
+        <div class="bg-slate-900 border border-slate-700 p-6 rounded-lg max-w-md w-full shadow-2xl">
+            <h3 id="msgBoxTitle" class="text-xl font-bold mb-2 text-white">Aviso</h3>
+            <p id="msgBoxText" class="text-slate-300 mb-6 font-sans">Mensagem.</p>
+            <div class="flex justify-end">
+                <button onclick="closeMsgBox()" class="btn-neon-blue px-6 py-2 rounded uppercase font-bold text-sm">Entendido</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Constantes da Modulação
-        const FREQ_OFFSET = 500;
-        const THRESHOLD_PERCENT = 0.40; // 40% da amplitude máxima para considerar como sinal válido
-        const MIN_FREQ_VIEW = 8000;
-        const MAX_FREQ_VIEW = 22000;
-        const TIMEOUT_MS = 1000; // Tempo sem sinal para quebrar linha
-
-        // Variáveis de Áudio
-        let audioCtx;
-        let analyser;
-        let microphone;
-        let dataArray;
-        let isListening = false;
-        let animationId;
-
-        // Estado do Demodulador
-        let rxState = {
-            isReceiving: false,
-            bitStartTime: 0,
-            bitIndex: 0,
-            bitBuffer: [],
-            lastSignalTime: 0,
-            baudRate: 10,
-            baseFreq: 10000,
-            bitDuration: 0.1 // segundos (1 / baudRate)
+        /* --- ESTADO E CONFIGURAÇÕES COMPARTILHADAS --- */
+        let config = {
+            baseFreq: 15000,
+            offsetFreq: 500,
+            baudRate: 20
         };
 
-        // Elementos UI
-        const UI = {
-            baseFreq: document.getElementById('baseFreq'),
-            freqValue: document.getElementById('freqValue'),
-            baudRate: document.getElementById('baudRate'),
-            baudValue: document.getElementById('baudValue'),
-            btnMic: document.getElementById('btnMic'),
-            micIndicator: document.getElementById('micIndicator'),
-            micText: document.getElementById('micText'),
-            micPulse: document.getElementById('micPulse'),
-            signalBar: document.getElementById('signalBar'),
-            signalLevel: document.getElementById('signalLevel'),
-            bitContainer: document.getElementById('bitContainer'),
-            lastChar: document.getElementById('lastChar'),
-            consoleOutput: document.getElementById('consoleOutput'),
-            btnClear: document.getElementById('btnClear'),
-            canvas: document.getElementById('receiverCanvas'),
-            markF0: document.getElementById('markF0'),
-            markF1: document.getElementById('markF1')
+        // Elementos UI Compartilhados e de Config
+        const inputs = {
+            txBaseFreq: document.getElementById('txBaseFreq'), txOffset: document.getElementById('txOffset'), txBaud: document.getElementById('txBaud'),
+            rxBaseFreq: document.getElementById('rxBaseFreq'), rxOffset: document.getElementById('rxOffset'), rxBaud: document.getElementById('rxBaud'),
+        };
+        const displays = {
+            txBaseFreqVal: document.getElementById('txBaseFreqVal'), txOffsetVal: document.getElementById('txOffsetVal'), txBaudVal: document.getElementById('txBaudVal'), txBitTime: document.getElementById('txBitTime'),
+            rxBaseFreqVal: document.getElementById('rxBaseFreqVal'), rxOffsetVal: document.getElementById('rxOffsetVal'), rxBaudVal: document.getElementById('rxBaudVal')
         };
 
-        const canvasCtx = UI.canvas.getContext('2d');
+        function syncConfigUI() {
+            // Se estou na tela TX, atualizo o estado com base no TX (e propago pro RX)
+            if (!document.getElementById('screenTX').classList.contains('hidden')) {
+                config.baseFreq = parseInt(inputs.txBaseFreq.value);
+                config.offsetFreq = parseInt(inputs.txOffset.value);
+                config.baudRate = parseInt(inputs.txBaud.value);
+                
+                inputs.rxBaseFreq.value = config.baseFreq;
+                inputs.rxOffset.value = config.offsetFreq;
+                inputs.rxBaud.value = config.baudRate;
+            } else {
+                config.baseFreq = parseInt(inputs.rxBaseFreq.value);
+                config.offsetFreq = parseInt(inputs.rxOffset.value);
+                config.baudRate = parseInt(inputs.rxBaud.value);
 
-        // Eventos dos Sliders
-        UI.baseFreq.addEventListener('input', (e) => {
-            rxState.baseFreq = parseInt(e.target.value);
-            UI.freqValue.textContent = `${rxState.baseFreq} Hz`;
-            updateMarkers();
-        });
+                inputs.txBaseFreq.value = config.baseFreq;
+                inputs.txOffset.value = config.offsetFreq;
+                inputs.txBaud.value = config.baudRate;
+            }
 
-        UI.baudRate.addEventListener('input', (e) => {
-            rxState.baudRate = parseInt(e.target.value);
-            rxState.bitDuration = 1.0 / rxState.baudRate;
-            UI.baudValue.textContent = `${rxState.baudRate} bps`;
-        });
+            // Atualiza textos
+            displays.txBaseFreqVal.textContent = displays.rxBaseFreqVal.textContent = `${config.baseFreq} Hz`;
+            displays.txOffsetVal.textContent = displays.rxOffsetVal.textContent = `+ ${config.offsetFreq} Hz`;
+            displays.txBaudVal.textContent = displays.rxBaudVal.textContent = `${config.baudRate} bps`;
+            displays.txBitTime.textContent = (1000 / config.baudRate).toFixed(1);
 
-        UI.btnClear.addEventListener('click', () => {
-            UI.consoleOutput.innerHTML = '';
-        });
-
-        // Atualiza a posição das linhas guia no Canvas
-        function updateMarkers() {
-            let f0 = rxState.baseFreq;
-            let f1 = f0 + FREQ_OFFSET;
-            
-            // Mapeia a frequência para a porcentagem de largura do canvas (focado entre MIN e MAX)
-            let percent0 = ((f0 - MIN_FREQ_VIEW) / (MAX_FREQ_VIEW - MIN_FREQ_VIEW)) * 100;
-            let percent1 = ((f1 - MIN_FREQ_VIEW) / (MAX_FREQ_VIEW - MIN_FREQ_VIEW)) * 100;
-            
-            // Proteção de limites
-            percent0 = Math.max(0, Math.min(100, percent0));
-            percent1 = Math.max(0, Math.min(100, percent1));
-
-            UI.markF0.style.left = `${percent0}%`;
-            UI.markF1.style.left = `${percent1}%`;
+            updateRxCanvasMarkers();
         }
 
-        // Redimensionamento do canvas
+        // Navegação
+        function switchMode(mode) {
+            document.getElementById('screenMenu').classList.add('hidden');
+            document.getElementById('screenTX').classList.add('hidden');
+            document.getElementById('screenRX').classList.add('hidden');
+            
+            // Segurança: Para operações ao sair
+            if(txActive) stopTransmission();
+            if(rxActive) toggleMic(true); // Força desligar
+
+            if (mode === 'menu') {
+                document.getElementById('screenMenu').classList.remove('hidden');
+            } else if (mode === 'tx') {
+                document.getElementById('screenTX').classList.remove('hidden');
+                syncConfigUI();
+            } else if (mode === 'rx') {
+                document.getElementById('screenRX').classList.remove('hidden');
+                syncConfigUI();
+                resizeCanvas();
+            }
+        }
+
+        function showMsgBox(title, text) {
+            document.getElementById('msgBoxTitle').textContent = title;
+            document.getElementById('msgBoxText').textContent = text;
+            document.getElementById('msgBox').classList.remove('hidden');
+        }
+        function closeMsgBox() { document.getElementById('msgBox').classList.add('hidden'); }
+
+
+        /* --- STREAMING_CHUNK:Lógica do Transmissor (TX) - Protocolo UART Virtual --- */
+        let txAudioCtx;
+        let txActive = false;
+        let txLog = document.getElementById('txStatusTerminal');
+
+        function logTx(msg) {
+            txLog.innerHTML += `\n[${new Date().toLocaleTimeString()}] ${msg}`;
+            txLog.scrollTop = txLog.scrollHeight;
+        }
+
+        function startTransmission() {
+            let text = document.getElementById('txInput').value;
+            if (!text) return showMsgBox("Erro TX", "Forneça um texto (payload) para transmitir.");
+
+            if (!txAudioCtx) txAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (txAudioCtx.state === 'suspended') txAudioCtx.resume();
+
+            txActive = true;
+            document.getElementById('btnTxStart').disabled = true;
+            document.getElementById('btnTxStart').classList.add('opacity-50');
+            document.getElementById('btnTxStop').disabled = false;
+            
+            txLog.innerHTML = "Iniciando geração do sinal FSK (Web Audio API precision scheduling)...";
+
+            // Parâmetros Físicos
+            const freq0 = config.baseFreq;            // SPACE (Start Bit, '0')
+            const freq1 = config.baseFreq + config.offsetFreq; // MARK (Idle, Stop Bit, Preamble, '1')
+            const bitDuration = 1.0 / config.baudRate;
+
+            let osc = txAudioCtx.createOscillator();
+            let gain = txAudioCtx.createGain();
+            osc.type = 'sine';
+            osc.connect(gain);
+            gain.connect(txAudioCtx.destination);
+
+            // Tempo de início seguro (0.2s no futuro para garantir que tudo agende bem)
+            let time = txAudioCtx.currentTime + 0.2; 
+            let frameCount = 0;
+
+            gain.gain.setValueAtTime(0, txAudioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(1, time); // Smooth start
+
+            // A Lógica UART: O transmissor precisa enviar bits num frame.
+            // Para cada caractere: Preamble(opcional para acordar), Start(0), 8xData(LSB), Stop(1)
+
+            // Loop por cada caractere da string
+            for (let i = 0; i < text.length; i++) {
+                let charCode = text.charCodeAt(i);
+                
+                // 1. Preamble (2 bits MARK) para o receptor ajustar threshold se necessário
+                osc.frequency.setValueAtTime(freq1, time);
+                time += 2 * bitDuration;
+
+                // 2. Start Bit (SPACE = freq0)
+                osc.frequency.setValueAtTime(freq0, time);
+                time += bitDuration;
+
+                // 3. Data Bits (8 bits, LSB first - Padrão UART)
+                for (let bit = 0; bit < 8; bit++) {
+                    let bitVal = (charCode >> bit) & 1;
+                    osc.frequency.setValueAtTime(bitVal ? freq1 : freq0, time);
+                    time += bitDuration;
+                }
+
+                // 4. Stop Bit (MARK = freq1) - Mantém no mínimo 2 bits de distância entre chars
+                osc.frequency.setValueAtTime(freq1, time);
+                time += 2 * bitDuration; 
+                
+                frameCount++;
+            }
+
+            // Fim da transmissão
+            gain.gain.setValueAtTime(1, time);
+            gain.gain.linearRampToValueAtTime(0, time + 0.1);
+            
+            osc.start(txAudioCtx.currentTime);
+            osc.stop(time + 0.2);
+
+            logTx(`Modulação concluída. Agendado ${frameCount} frames UART.`);
+            let durationSecs = (time - txAudioCtx.currentTime).toFixed(2);
+            logTx(`Duração estimada de transmissão: ${durationSecs} segundos.`);
+            logTx(`Emitindo ultrassom... Aguarde.`);
+
+            // Reseta UI quando o tempo acabar
+            setTimeout(() => {
+                if(txActive) {
+                    stopTransmission();
+                    logTx(`Transmissão finalizada.`);
+                }
+            }, (time - txAudioCtx.currentTime + 0.5) * 1000);
+            
+            // Armazena referencias caso precise forçar a parada (Halt)
+            window.currentTxOsc = osc;
+            window.currentTxGain = gain;
+        }
+
+        function stopTransmission() {
+            txActive = false;
+            document.getElementById('btnTxStart').disabled = false;
+            document.getElementById('btnTxStart').classList.remove('opacity-50');
+            document.getElementById('btnTxStop').disabled = true;
+
+            try {
+                if (window.currentTxOsc) {
+                    window.currentTxOsc.stop();
+                    window.currentTxOsc.disconnect();
+                }
+                if (window.currentTxGain) window.currentTxGain.disconnect();
+            } catch(e) {}
+            logTx("Sistema em espera.");
+        }
+
+
+        /* --- STREAMING_CHUNK:Lógica do Receptor (RX) - Demodulação Rápida e Clock Recovery --- */
+        let rxAudioCtx, rxAnalyser, rxMicSource;
+        let rxActive = false;
+        let rxAnimId;
+        const rxCanvas = document.getElementById('rxCanvas');
+        const rxCtx = rxCanvas.getContext('2d');
+        const terminal = document.getElementById('rxTerminal');
+        const rxStateDisplay = document.getElementById('rxStateDisplay');
+
         function resizeCanvas() {
-            const rect = UI.canvas.parentElement.getBoundingClientRect();
-            UI.canvas.width = rect.width;
-            UI.canvas.height = rect.height;
-            updateMarkers();
+            rxCanvas.width = rxCanvas.parentElement.clientWidth;
+            rxCanvas.height = rxCanvas.parentElement.clientHeight;
+            updateRxCanvasMarkers();
         }
         window.addEventListener('resize', resizeCanvas);
-        setTimeout(resizeCanvas, 100);
 
-        async function toggleMicrophone() {
-            if (isListening) {
-                stopListening();
+        function updateRxCanvasMarkers() {
+            if (!rxAudioCtx) return;
+            const minViewFreq = 8000;
+            const maxViewFreq = 22000;
+            
+            let p0 = ((config.baseFreq - minViewFreq) / (maxViewFreq - minViewFreq)) * 100;
+            let p1 = ((config.baseFreq + config.offsetFreq - minViewFreq) / (maxViewFreq - minViewFreq)) * 100;
+            
+            document.getElementById('rxMarker0').style.left = `${Math.min(100, Math.max(0, p0))}%`;
+            document.getElementById('rxMarker1').style.left = `${Math.min(100, Math.max(0, p1))}%`;
+        }
+
+        async function toggleMic(forceStop = false) {
+            if (rxActive || forceStop) {
+                rxActive = false;
+                if(rxMicSource) rxMicSource.disconnect();
+                if(rxAudioCtx) rxAudioCtx.close();
+                cancelAnimationFrame(rxAnimId);
+                
+                document.getElementById('txtBtnMic').textContent = "Ativar Escuta (Mic)";
+                document.getElementById('btnRxMic').classList.replace('btn-neon-green', 'btn-neon-blue');
+                document.getElementById('rxStatusIndicator').classList.replace('bg-green-500', 'bg-slate-600');
+                document.getElementById('rxStatusIndicator').classList.remove('animate-pulse');
+                rxStateDisplay.textContent = "STATE: OFF";
+                rxCtx.clearRect(0,0, rxCanvas.width, rxCanvas.height);
                 return;
             }
 
             try {
-                // Muito importante: desabilitar processamento de áudio do SO/Browser 
-                // para que as frequências altas não sejam cortadas como "ruído de fundo".
+                // Acesso crítico ao microfone sem filtros
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false
-                    }
+                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
                 });
 
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                rxAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                rxAnalyser = rxAudioCtx.createAnalyser();
                 
-                // fftSize 8192 oferece uma boa resolução de frequência 
-                // (44100 / 8192 = ~5.38 Hz por bin), suficiente para separar 500Hz
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 8192;
-                analyser.smoothingTimeConstant = 0.2; // Rápida resposta para não misturar os bits
+                // fftSize pequeno (512) é ESSENCIAL para suportar Baud Rates mais altos (menor blur temporal)
+                // 44100 / 512 = ~86Hz de resolução. 500Hz de offset é lido facilmente.
+                // Resolução temporal: 512 / 44100 = ~11.6ms. Suporta até ~86 bps teoricamente.
+                rxAnalyser.fftSize = 512;
+                rxAnalyser.smoothingTimeConstant = 0.1; // Resposta super rápida
                 
-                microphone = audioCtx.createMediaStreamSource(stream);
-                microphone.connect(analyser);
-                
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                rxMicSource = rxAudioCtx.createMediaStreamSource(stream);
+                rxMicSource.connect(rxAnalyser);
 
-                isListening = true;
+                rxActive = true;
+                document.getElementById('txtBtnMic').textContent = "Parar Escuta";
+                document.getElementById('btnRxMic').classList.replace('btn-neon-blue', 'btn-neon-green');
+                document.getElementById('rxStatusIndicator').classList.replace('bg-slate-600', 'bg-green-500');
+                document.getElementById('rxStatusIndicator').classList.add('animate-pulse');
                 
-                // UI Atualização
-                UI.micIndicator.classList.replace('bg-red-500', 'bg-emerald-500');
-                UI.micPulse.classList.replace('bg-red-500', 'bg-emerald-500');
-                UI.micPulse.classList.remove('hidden');
-                UI.micText.textContent = "Escutando...";
-                UI.btnMic.classList.replace('border-slate-600', 'border-emerald-500');
-
-                // Reinicia estado rx
-                rxState.isReceiving = false;
-                rxState.bitBuffer = [];
-                rxState.bitDuration = 1.0 / rxState.baudRate;
-
-                processAudio();
+                updateRxCanvasMarkers();
+                rxDemodulationLoop();
 
             } catch (err) {
-                console.error("Erro ao acessar microfone:", err);
-                alert("Erro ao acessar o microfone. Verifique as permissões do navegador.\nDetalhes: " + err.message);
+                showMsgBox("Erro Microfone", "Permissão negada ou hardware indisponível. " + err.message);
             }
         }
 
-        function stopListening() {
-            if (microphone) microphone.disconnect();
-            if (audioCtx) audioCtx.close();
-            
-            isListening = false;
-            cancelAnimationFrame(animationId);
-            
-            UI.micIndicator.classList.replace('bg-emerald-500', 'bg-red-500');
-            UI.micPulse.classList.add('hidden');
-            UI.micText.textContent = "Ligar Microfone";
-            UI.btnMic.classList.replace('border-emerald-500', 'border-slate-600');
-            
-            UI.signalBar.style.width = '0%';
-            UI.signalLevel.textContent = '0%';
-            UI.signalBar.classList.replace('bg-emerald-500', 'bg-slate-600');
+        /* Máquina de Estado do Demodulador */
+        let rxState = 'IDLE'; 
+        let bitStartTime = 0;
+        let currentBitIndex = 0;
+        let currentByteVal = 0;
+        let bitDurationSec = 0;
+        let noiseFloor = 0;
 
-            canvasCtx.clearRect(0, 0, UI.canvas.width, UI.canvas.height);
+        function getEnergyAtFreq(freq, dataArray, sampleRate, fftSize) {
+            let nyquist = sampleRate / 2;
+            let bin = Math.round((freq / nyquist) * (fftSize / 2));
+            // Pega energia do bin e dos vizinhos imediatos para lidar com pequeno vazamento
+            let maxEnergy = 0;
+            if(bin > 0 && dataArray[bin-1] > maxEnergy) maxEnergy = dataArray[bin-1];
+            if(dataArray[bin] > maxEnergy) maxEnergy = dataArray[bin];
+            if(bin < dataArray.length-1 && dataArray[bin+1] > maxEnergy) maxEnergy = dataArray[bin+1];
+            return maxEnergy;
         }
 
-        // Função auxiliar para encontrar a energia ao redor de um bin específico
-        function getPeakEnergy(data, targetBin, windowSize = 2) {
-            let max = 0;
-            let start = Math.max(0, targetBin - windowSize);
-            let end = Math.min(data.length - 1, targetBin + windowSize);
-            for (let i = start; i <= end; i++) {
-                if (data[i] > max) max = data[i];
-            }
-            return max;
-        }
+        function rxDemodulationLoop() {
+            if (!rxActive) return;
+            rxAnimId = requestAnimationFrame(rxDemodulationLoop);
 
-        function appendToConsole(text) {
-            // Cria um span temporário para animar a entrada
-            const span = document.createElement('span');
-            span.textContent = text;
-            span.className = 'opacity-0 transition-opacity duration-300';
-            UI.consoleOutput.appendChild(span);
+            const bufferLength = rxAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            rxAnalyser.getByteFrequencyData(dataArray);
             
-            // Trigger reflow
-            void span.offsetWidth;
-            span.classList.remove('opacity-0');
+            let currentTime = rxAudioCtx.currentTime;
+            bitDurationSec = 1.0 / config.baudRate;
 
-            // Auto-scroll
-            UI.consoleOutput.scrollTop = UI.consoleOutput.scrollHeight;
-        }
-
-        function processAudio() {
-            if (!isListening) return;
-            animationId = requestAnimationFrame(processAudio);
-
-            analyser.getByteFrequencyData(dataArray);
-            let currentTime = audioCtx.currentTime;
-
-            // 1. Identificar os bins de frequência
-            let nyquist = audioCtx.sampleRate / 2;
-            let f0 = rxState.baseFreq;
-            let f1 = f0 + FREQ_OFFSET;
+            const freq0 = config.baseFreq;
+            const freq1 = config.baseFreq + config.offsetFreq;
             
-            let bin0 = Math.round((f0 / nyquist) * (analyser.fftSize / 2));
-            let bin1 = Math.round((f1 / nyquist) * (analyser.fftSize / 2));
+            let mag0 = getEnergyAtFreq(freq0, dataArray, rxAudioCtx.sampleRate, rxAnalyser.fftSize);
+            let mag1 = getEnergyAtFreq(freq1, dataArray, rxAudioCtx.sampleRate, rxAnalyser.fftSize);
 
-            // 2. Extrair energia (amplitude) nessas frequências
-            let mag0 = getPeakEnergy(dataArray, bin0, 2);
-            let mag1 = getPeakEnergy(dataArray, bin1, 2);
+            // Dinâmica de ruído (calibração rudimentar)
+            let avgNoise = 0;
+            for(let i=100; i<150; i++) avgNoise += dataArray[i]; // pega faixa genérica
+            avgNoise = avgNoise / 50;
+            noiseFloor = noiseFloor * 0.99 + avgNoise * 0.01;
             
-            let maxMag = Math.max(mag0, mag1);
-            let thresholdValue = 255 * THRESHOLD_PERCENT;
-            let hasSignal = maxMag > thresholdValue;
+            let signalThreshold = Math.max(50, noiseFloor + 30); // Limite mínimo de ativação
 
-            // Atualiza barra de sinal na UI
-            let signalPercent = (maxMag / 255) * 100;
-            UI.signalBar.style.width = `${signalPercent}%`;
-            UI.signalLevel.textContent = `${Math.round(signalPercent)}%`;
-            if (hasSignal) {
-                UI.signalBar.classList.replace('bg-slate-600', 'bg-emerald-500');
-            } else {
-                UI.signalBar.classList.replace('bg-emerald-500', 'bg-slate-600');
-            }
+            // Lógica da Máquina de Estados (Clock Recovery e UART)
+            if (rxState === 'IDLE') {
+                rxStateDisplay.textContent = "STATE: IDLE / WAIT_START";
+                rxStateDisplay.style.color = "#64748b"; // slate-500
 
-            // 3. Máquina de Estado do Demodulador (Clock Recovery aproximado)
-            if (hasSignal) {
-                rxState.lastSignalTime = currentTime;
-                
-                // Detecção de início de transmissão
-                if (!rxState.isReceiving) {
-                    rxState.isReceiving = true;
-                    rxState.bitStartTime = currentTime; // Sincroniza o relógio no primeiro sinal
-                    rxState.bitIndex = 0;
-                    rxState.bitBuffer = [];
-                    UI.bitContainer.innerHTML = '';
-                    UI.lastChar.textContent = '_';
+                // Procura pelo Start Bit (Space / Freq0 predominante e alto volume)
+                if (mag0 > signalThreshold && mag0 > (mag1 + 20)) {
+                    rxState = 'READING_DATA';
+                    // O start bit começou. O centro do primeiro bit de dados (bit 0) 
+                    // será 1.5 * bitDuration a partir de agora.
+                    bitStartTime = currentTime; 
+                    currentBitIndex = 0;
+                    currentByteVal = 0;
                 }
-            }
+            } 
+            else if (rxState === 'READING_DATA') {
+                rxStateDisplay.textContent = "STATE: SYNC_LOCK (Reading)";
+                rxStateDisplay.style.color = "#39ff14"; // neon-green
 
-            if (rxState.isReceiving) {
-                // Calcula quando devemos amostrar o bit atual (no centro do tempo do bit)
-                let expectedSampleTime = rxState.bitStartTime + (rxState.bitIndex + 0.5) * rxState.bitDuration;
+                // Calcula momento ideal para amostragem no CENTRO do bit (Center-Sampling)
+                // Offset de 1.5: Pula o Start Bit (1.0) e vai para a metade do Bit de Dados 0 (0.5)
+                let sampleTime = bitStartTime + (currentBitIndex + 1.5) * bitDurationSec;
 
-                if (currentTime >= expectedSampleTime) {
-                    // Hora de ler um bit!
-                    // Comparamos as magnitudes para decidir. Se ambas baixas (perda de sinal), chuta 0.
-                    let currentBit = (mag1 > mag0 && mag1 > thresholdValue * 0.5) ? 1 : 0;
+                if (currentTime >= sampleTime) {
+                    // Momento de amostrar o bit!
+                    // Lógica de decisão: Se Freq1 > Freq0 é 1, senão 0.
+                    let bitValue = (mag1 > mag0) ? 1 : 0;
                     
-                    rxState.bitBuffer.push(currentBit);
+                    // UART LSB first: desloca o bit para a esquerda e acumula
+                    currentByteVal |= (bitValue << currentBitIndex);
                     
-                    // UI: Adiciona bit visual
-                    const bitEl = document.createElement('div');
-                    bitEl.className = `bit-box font-mono text-sm ${currentBit === 1 ? 'bit-1' : 'bit-0'}`;
-                    bitEl.textContent = currentBit;
-                    UI.bitContainer.appendChild(bitEl);
+                    currentBitIndex++;
 
-                    // Se juntou 8 bits (1 byte)
-                    if (rxState.bitBuffer.length === 8) {
-                        let byteStr = rxState.bitBuffer.join('');
-                        let charCode = parseInt(byteStr, 2);
+                    if (currentBitIndex >= 8) {
+                        // Lemos o byte inteiro.
+                        // Converte para ASCII se for imprimível ou Enter
+                        if ((currentByteVal >= 32 && currentByteVal <= 126) || currentByteVal === 10) {
+                            terminal.innerHTML += String.fromCharCode(currentByteVal);
+                            terminal.scrollTop = terminal.scrollHeight;
+                        } else {
+                            // Caractere inválido ou erro de leitura (mostra um bloquinho)
+                            terminal.innerHTML += '▒';
+                        }
                         
-                        // Filtra caracteres ASCII imprimíveis básicos para evitar lixo
-                        let char = (charCode >= 32 && charCode <= 126) || charCode === 10 ? String.fromCharCode(charCode) : '';
-                        
-                        UI.lastChar.textContent = char;
-                        appendToConsole(char);
-                        
-                        rxState.bitBuffer = [];
-                        UI.bitContainer.innerHTML = ''; // Limpa buffer visual
+                        // Vai para estado de resfriamento para ignorar o Stop Bit e não ler falso start
+                        rxState = 'WAIT_STOP';
                     }
-                    
-                    rxState.bitIndex++;
+                }
+
+                // Timeout de segurança: Se travou (jitter extremo do sistema), aborta.
+                if (currentTime > bitStartTime + 12 * bitDurationSec) {
+                    rxState = 'IDLE';
+                }
+            }
+            else if (rxState === 'WAIT_STOP') {
+                rxStateDisplay.textContent = "STATE: WAIT_STOP";
+                // Espera meio bit time antes de voltar para o idle, pra garantir que o stop bit (Freq1) passou
+                if (currentTime > bitStartTime + 9.5 * bitDurationSec) {
+                    rxState = 'IDLE';
                 }
             }
 
-            // 4. Timeout: Se ficou muito tempo sem sinal, quebra a linha e volta pra IDLE
-            if (rxState.isReceiving && (currentTime - rxState.lastSignalTime > (TIMEOUT_MS / 1000))) {
-                rxState.isReceiving = false;
-                appendToConsole('\n');
-                
-                if (rxState.bitBuffer.length > 0) {
-                    UI.bitContainer.innerHTML = '<span class="text-red-400 text-sm italic">Dados incompletos descartados</span>';
-                } else {
-                    UI.bitContainer.innerHTML = '<span class="text-slate-600 text-sm italic">Aguardando sinal...</span>';
-                }
-                rxState.bitBuffer = [];
-            }
 
-            // 5. Desenhar Espectro
-            drawSpectrum(nyquist);
+            // Desenho do Espectro Visual
+            drawSpectrum(dataArray, rxAudioCtx.sampleRate);
         }
 
-        function drawSpectrum(nyquist) {
-            // Fundo com fade para efeito rastro
-            canvasCtx.fillStyle = 'rgba(2, 6, 23, 0.25)'; // bg-slate-950 com transparência
-            canvasCtx.fillRect(0, 0, UI.canvas.width, UI.canvas.height);
+        function drawSpectrum(dataArray, sampleRate) {
+            rxCtx.fillStyle = 'rgba(2, 6, 23, 0.3)'; // Efeito cauda/trail
+            rxCtx.fillRect(0, 0, rxCanvas.width, rxCanvas.height);
 
-            // Mapeando bins apenas para a faixa desejada (8kHz a 22kHz)
-            let minBin = Math.floor((MIN_FREQ_VIEW / nyquist) * (analyser.fftSize / 2));
-            let maxBin = Math.ceil((MAX_FREQ_VIEW / nyquist) * (analyser.fftSize / 2));
+            const minViewFreq = 8000;
+            const maxViewFreq = 22000;
+            let nyquist = sampleRate / 2;
             
-            // Proteções contra erros
-            minBin = Math.max(0, minBin);
-            maxBin = Math.min(dataArray.length - 1, maxBin);
-
+            let minBin = Math.floor((minViewFreq / nyquist) * rxAnalyser.frequencyBinCount);
+            let maxBin = Math.ceil((maxViewFreq / nyquist) * rxAnalyser.frequencyBinCount);
             let visibleBins = maxBin - minBin;
-            if (visibleBins <= 0) return;
+            
+            let barWidth = rxCanvas.width / visibleBins;
+            
+            for (let i = 0; i < visibleBins; i++) {
+                let amplitude = dataArray[minBin + i];
+                if(amplitude < 5) continue; // Remove sujeira base visual
 
-            let barWidth = UI.canvas.width / visibleBins;
-            let x = 0;
-
-            for (let i = minBin; i <= maxBin; i++) {
-                let amplitude = dataArray[i];
-                // Ignorar ruído absoluto baixo para não poluir o gráfico
-                if (amplitude < 10) amplitude = 0; 
-
-                let barHeight = (amplitude / 255) * UI.canvas.height;
+                let barHeight = (amplitude / 255) * rxCanvas.height;
+                let x = i * barWidth;
                 
-                // Cores dinâmicas (azul/verde para frequências)
-                canvasCtx.fillStyle = `rgb(56, 189, 248)`; // Sky 400 base
-                
-                // Destacar se for pico alto
-                if (amplitude > 150) {
-                    canvasCtx.fillStyle = '#34d399'; // Emerald 400
-                }
-
-                canvasCtx.fillRect(x, UI.canvas.height - barHeight, Math.max(1, barWidth - 0.5), barHeight);
-                x += barWidth;
+                // Cor: se for pico alto, verde neon, senao azul cyan escuro
+                rxCtx.fillStyle = amplitude > 160 ? 'rgba(57, 255, 20, 0.9)' : 'rgba(0, 243, 255, 0.4)';
+                rxCtx.fillRect(x, rxCanvas.height - barHeight, Math.max(1, barWidth - 0.5), barHeight);
             }
         }
-
-        // Event Listeners Finais
-        UI.btnMic.addEventListener('click', toggleMicrophone);
-
     </script>
 </body>
 </html>
